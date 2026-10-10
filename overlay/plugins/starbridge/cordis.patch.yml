@@ -1,0 +1,3 @@
+- insert:
+    - id: starbridge
+      name: '@kongpingan/dsh-starbridge'

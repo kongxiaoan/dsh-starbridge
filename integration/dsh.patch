@@ -1,0 +1,1120 @@
+diff --git a/apps/web/tsconfig.json b/apps/web/tsconfig.json
+index 7c03df4930..0e0dd5f73a 100644
+--- a/apps/web/tsconfig.json
++++ b/apps/web/tsconfig.json
+@@ -22,6 +22,7 @@
+   // this client-registered project must not also hold them (one program
+   // cannot see both sides of the cordis Context merges).
+   "exclude": [
++    "tests/starbridge.release.ts",
+     "tests/collapse-timing.e2e.ts",
+     "tests/chat-flow-layout.e2e.ts",
+     "tests/layout-bottom.e2e.ts",
+diff --git a/docs/capability-seams.i18n.yaml b/docs/capability-seams.i18n.yaml
+index 182bb9349e..cdd044cdeb 100644
+--- a/docs/capability-seams.i18n.yaml
++++ b/docs/capability-seams.i18n.yaml
+@@ -6,5 +6,5 @@
+   en: 41d772192075e133
+   zh: 5ef3da69b4de1d8a
+ /capability-seams-and-core-services:
+-  en: 912784044de3337d
+-  zh: 6a03f65751cda74a
++  en: 2e37e711809e0d1d
++  zh: 7aedb19f95736b77
+diff --git a/docs/capability-seams.md b/docs/capability-seams.md
+index 7619be90f4..a81cfba0bb 100644
+--- a/docs/capability-seams.md
++++ b/docs/capability-seams.md
+@@ -115,6 +115,9 @@ flowchart LR
+   pkg_credentials["credentials"]
+   svc_credentials["ctx.credentials<br/>Credential seam"]
+   pkg_credentials_local["credentials-local"]
++  pkg_starbridge["starbridge"]
++  svc_chatGpt["ctx.chatGpt<br/>ChatGPT account authorization"]
++  pkg_client_ui_starbridge["client-ui-starbridge"]
+   pkg_deepseek_account["deepseek-account"]
+   svc_deepseekAccount["ctx.deepseekAccount<br/>DeepSeek account"]
+   pkg_deepseek_account_platform["deepseek-account-platform"]
+@@ -404,6 +407,7 @@ flowchart LR
+   pkg_spill --> svc_spillStore
+   pkg_spill_local --> svc_spillStore
+   pkg_ssh --> svc_ssh
++  pkg_starbridge --> svc_chatGpt
+   pkg_storage --> svc_storage
+   pkg_storage_domain --> svc_storageDomain
+   pkg_storage_json --> svc_storage
+@@ -457,6 +461,8 @@ flowchart LR
+   svc_browserUse --> pkg_experimental_browser_use_chrome_devtools_mcp
+   svc_browserUse --> pkg_experimental_browser_use_playwright_mcp
+   svc_browserUse --> pkg_experimental_browser_use_stagehand_native
++  svc_chatGpt --> pkg_client_ui_starbridge
++  svc_chatGpt --> pkg_starbridge
+   svc_clientModules --> pkg_client_hmr
+   svc_compaction --> pkg_compaction_basic
+   svc_computerUse --> pkg_experimental_computer_use_cua_driver_mcp
+@@ -631,6 +637,7 @@ flowchart LR
+ | `ctx.settings` | `core` | [`settings`](../packages/settings/settings) | - | [`api-settings-controller`](../packages/api/settings-controller) | - | Forms project volatile Config fields from active profile entries and delegate validated edits to config-editor. Plugins consume their own Config references. |
+ | `ctx.subagentModelSelection` | `core` | [`tool-subagent`](../packages/subagent/tool-subagent) | - | [`tool-subagent`](../packages/subagent/tool-subagent) | - | Owns the default-off settings namespace that Agent-scoped delegation tools sample when composing a new top-level Session. |
+ | `ctx.credentials` | `seam` | [`credentials`](../packages/credentials/credentials) | [`credentials-local`](../packages/credentials/credentials-local) | [`api-settings-controller`](../packages/api/settings-controller), [`llm-deepseek`](../packages/llm/llm-deepseek), [`llm-pi-ai`](../packages/llm/llm-pi-ai) | - | Configuration carries references to secrets; providers own the values. Consumers resolve per operation, so a rotated credential reaches the very next request; the settings controller exposes value-free views and write-only storage. |
++| `ctx.chatGpt` | `core` | [`starbridge`](../packages/llm/starbridge) | - | [`starbridge`](../packages/llm/starbridge), [`client-ui-starbridge`](../packages/client/ui-starbridge) | - | Owns verified local ChatGPT registrations and credential-free Remote state; inference reuses the pi-ai Responses adapter. |
+ | `ctx.deepseekAccount` | `seam` | [`deepseek-account`](../packages/credentials/deepseek-account) | [`deepseek-account-platform`](../packages/credentials/deepseek-account-platform) | [`api-account-controller`](../packages/api/account-controller), [`llm-deepseek`](../packages/llm/llm-deepseek) | - | The Host owns browser authorization and local credentials; UI consumers receive state without tokens. |
+ | `ctx.authorization` | `seam` | [`authorization`](../packages/credentials/authorization) | - | [`llm-pi-ai`](../packages/llm/llm-pi-ai) | - | Flows are registered by the plugin that knows how to obtain one credential and keyed by the record they write; the seam owns the conversation and the one-attempt-per-key lifecycle, never the protocol. |
+ | `ctx.productAnalytics` | `service` | [`client-product-analytics`](../packages/client/product-analytics) | - | - | - | Accepts selected Desktop events, enriches available login identity, and observes live compaction under the live Host collection policy. |
+diff --git a/docs/capability-seams.zh.md b/docs/capability-seams.zh.md
+index b02ec2e41c..812c166ce5 100644
+--- a/docs/capability-seams.zh.md
++++ b/docs/capability-seams.zh.md
+@@ -117,6 +117,9 @@ flowchart LR
+   pkg_credentials["credentials"]
+   svc_credentials["ctx.credentials<br/>Credential seam"]
+   pkg_credentials_local["credentials-local"]
++  pkg_starbridge["starbridge"]
++  svc_chatGpt["ctx.chatGpt<br/>ChatGPT account authorization"]
++  pkg_client_ui_starbridge["client-ui-starbridge"]
+   pkg_deepseek_account["deepseek-account"]
+   svc_deepseekAccount["ctx.deepseekAccount<br/>DeepSeek account"]
+   pkg_deepseek_account_platform["deepseek-account-platform"]
+@@ -406,6 +409,7 @@ flowchart LR
+   pkg_spill --> svc_spillStore
+   pkg_spill_local --> svc_spillStore
+   pkg_ssh --> svc_ssh
++  pkg_starbridge --> svc_chatGpt
+   pkg_storage --> svc_storage
+   pkg_storage_domain --> svc_storageDomain
+   pkg_storage_json --> svc_storage
+@@ -459,6 +463,8 @@ flowchart LR
+   svc_browserUse --> pkg_experimental_browser_use_chrome_devtools_mcp
+   svc_browserUse --> pkg_experimental_browser_use_playwright_mcp
+   svc_browserUse --> pkg_experimental_browser_use_stagehand_native
++  svc_chatGpt --> pkg_client_ui_starbridge
++  svc_chatGpt --> pkg_starbridge
+   svc_clientModules --> pkg_client_hmr
+   svc_compaction --> pkg_compaction_basic
+   svc_computerUse --> pkg_experimental_computer_use_cua_driver_mcp
+@@ -633,6 +639,7 @@ flowchart LR
+ | `ctx.settings` | `core` | [`settings`](../packages/settings/settings) | - | [`api-settings-controller`](../packages/api/settings-controller) | - | Forms project volatile Config fields from active profile entries and delegate validated edits to config-editor. Plugins consume their own Config references. |
+ | `ctx.subagentModelSelection` | `core` | [`tool-subagent`](../packages/subagent/tool-subagent) | - | [`tool-subagent`](../packages/subagent/tool-subagent) | - | 拥有默认关闭的设置命名空间；Agent 作用域的委派工具会在组合新顶层 Session 时读取它。 |
+ | `ctx.credentials` | `seam` | [`credentials`](../packages/credentials/credentials) | [`credentials-local`](../packages/credentials/credentials-local) | [`api-settings-controller`](../packages/api/settings-controller), [`llm-deepseek`](../packages/llm/llm-deepseek), [`llm-pi-ai`](../packages/llm/llm-pi-ai) | - | 配置携带对机密信息的引用；提供方拥有实际值。消费方按操作解析，因此轮换后的凭据会在紧接着的下一次请求中生效；settings controller 提供不含实际值的视图和只写存储。 |
++| `ctx.chatGpt` | `core` | [`starbridge`](../packages/llm/starbridge) | - | [`starbridge`](../packages/llm/starbridge), [`client-ui-starbridge`](../packages/client/ui-starbridge) | - | 管理已验证的本地 ChatGPT 注册信息和不含凭据的 Remote 状态；推理复用 pi-ai Responses 适配器。 |
+ | `ctx.deepseekAccount` | `seam` | [`deepseek-account`](../packages/credentials/deepseek-account) | [`deepseek-account-platform`](../packages/credentials/deepseek-account-platform) | [`api-account-controller`](../packages/api/account-controller), [`llm-deepseek`](../packages/llm/llm-deepseek) | - | Host 负责浏览器授权和本地凭证；UI 使用方只接收不含 token 的状态。 |
+ | `ctx.authorization` | `seam` | [`authorization`](../packages/credentials/authorization) | - | [`llm-pi-ai`](../packages/llm/llm-pi-ai) | - | flow 由知道如何取得某份凭据的插件注册，并以其写入的记录为键；seam 拥有这段对话与"每个键同时只跑一次尝试"的生命周期，而非协议本身。 |
+ | `ctx.productAnalytics` | `service` | [`client-product-analytics`](../packages/client/product-analytics) | - | - | - | 根据 Host 动态采集策略接收指定桌面事件、补充可用登录身份并监听实时压缩。 |
+diff --git a/docs/config-catalog.md b/docs/config-catalog.md
+index 17856848d5..69c5d70b38 100644
+--- a/docs/config-catalog.md
++++ b/docs/config-catalog.md
+@@ -1743,7 +1743,7 @@ export interface Config extends ProtocolConfig {
+ 
+ - `inject`: `llm`
+ - `refs`: `Api` (`@earendil-works/pi-ai`) · `CacheRetention` (`@earendil-works/pi-ai`) · `Model` (`@earendil-works/pi-ai`) · `ModelThinkingLevel` (`@earendil-works/pi-ai`) · `OpenAICompletionsCompat` (`@earendil-works/pi-ai`) · [`RetryPolicyConfig`](../packages/llm/llm/src/index.ts) · `ThinkingBudgets` (`@earendil-works/pi-ai`) · `Transport` (`@earendil-works/pi-ai`) · `Volatile` (`@deepseek-ai/cordis`)
+-- `source`: [`packages/llm/llm-pi-ai/src/config.ts:222`](../packages/llm/llm-pi-ai/src/config.ts)
++- `source`: [`packages/llm/llm-pi-ai/src/config.ts:224`](../packages/llm/llm-pi-ai/src/config.ts)
+ 
+ ```ts config-catalog
+ /** Plugin configuration: the provider routes this instance owns. */
+@@ -1822,6 +1822,8 @@ export interface PiAiProviderProfile {
+   reasoning?: ModelThinkingLevel
+   /** Token budgets used by reasoning providers that support them. */
+   thinkingBudgets?: ThinkingBudgets
++  /** ChatGPT Responses service tier; omission preserves the server default. Fast may consume more plan usage. */
++  serviceTier?: 'default' | 'fast'
+   /** Prompt-cache retention preference. */
+   cacheRetention?: CacheRetention
+   /** Streaming transport preference. */
+@@ -3165,6 +3167,28 @@ export type HelperLaunch = {
+ ```
+ <!-- END GENERATED config-catalog:@deepseek-ai/dsh-ssh -->
+ 
++<!-- BEGIN GENERATED config-catalog:@deepseek-ai/dsh-starbridge -->
++<a id="deepseek-aidsh-starbridge"></a>
++
++## `@deepseek-ai/dsh-starbridge`
++
++- `inject`: `llm` · `credentials` · `authorization` · `settings`
++- `refs`: `Volatile` (`@deepseek-ai/cordis`)
++- `source`: [`packages/llm/starbridge/src/index.ts:25`](../packages/llm/starbridge/src/index.ts)
++
++```ts config-catalog
++/** Resolved Starbridge configuration. */
++export interface Config {
++  /** Processing tier used by subsequent Responses requests. */
++  serviceTier: Volatile<'default' | 'fast'>
++  /** Maximum browser authorization lifetime in milliseconds. */
++  signInTimeoutMs: number
++  /** Maximum refresh or revocation request lifetime in milliseconds. */
++  requestTimeoutMs: number
++}
++```
++<!-- END GENERATED config-catalog:@deepseek-ai/dsh-starbridge -->
++
+ <!-- BEGIN GENERATED config-catalog:@deepseek-ai/dsh-storage-domain -->
+ <a id="deepseek-aidsh-storage-domain"></a>
+ 
+@@ -4645,6 +4669,7 @@ Imported as libraries by other packages; a `cordis.yml` cannot load them.
+ | `@deepseek-ai/dsh-client-ui-dockkit` | — | [`packages/client/ui-dockkit/src/index.ts`](../packages/client/ui-dockkit/src/index.ts) |
+ | `@deepseek-ai/dsh-client-ui-primitives` | — | [`packages/client/ui-primitives/src/index.ts`](../packages/client/ui-primitives/src/index.ts) |
+ | `@deepseek-ai/dsh-client-ui-slots` | — | [`packages/client/ui-slots/src/index.ts`](../packages/client/ui-slots/src/index.ts) |
++| `@deepseek-ai/dsh-client-ui-starbridge` | — | [`packages/client/ui-starbridge/src/index.ts`](../packages/client/ui-starbridge/src/index.ts) |
+ | `@deepseek-ai/dsh-client-web` | — | [`packages/client/web/src/index.ts`](../packages/client/web/src/index.ts) |
+ | `@deepseek-ai/dsh-cmdline` | — | [`packages/boot/cmdline/src/index.ts`](../packages/boot/cmdline/src/index.ts) |
+ | `@deepseek-ai/dsh-deque` | — | [`packages/util/deque/src/index.ts`](../packages/util/deque/src/index.ts) |
+diff --git a/docs/config-catalog.zh.md b/docs/config-catalog.zh.md
+index c4ab85cdda..8f9a5791c5 100644
+--- a/docs/config-catalog.zh.md
++++ b/docs/config-catalog.zh.md
+@@ -1745,7 +1745,7 @@ export interface Config extends ProtocolConfig {
+ 
+ - `inject`: `llm`
+ - `refs`: `Api` (`@earendil-works/pi-ai`) · `CacheRetention` (`@earendil-works/pi-ai`) · `Model` (`@earendil-works/pi-ai`) · `ModelThinkingLevel` (`@earendil-works/pi-ai`) · `OpenAICompletionsCompat` (`@earendil-works/pi-ai`) · [`RetryPolicyConfig`](../packages/llm/llm/src/index.ts) · `ThinkingBudgets` (`@earendil-works/pi-ai`) · `Transport` (`@earendil-works/pi-ai`) · `Volatile` (`@deepseek-ai/cordis`)
+-- `source`: [`packages/llm/llm-pi-ai/src/config.ts:222`](../packages/llm/llm-pi-ai/src/config.ts)
++- `source`: [`packages/llm/llm-pi-ai/src/config.ts:224`](../packages/llm/llm-pi-ai/src/config.ts)
+ 
+ ```ts config-catalog
+ /** Plugin configuration: the provider routes this instance owns. */
+@@ -1824,6 +1824,8 @@ export interface PiAiProviderProfile {
+   reasoning?: ModelThinkingLevel
+   /** Token budgets used by reasoning providers that support them. */
+   thinkingBudgets?: ThinkingBudgets
++  /** ChatGPT Responses service tier; omission preserves the server default. Fast may consume more plan usage. */
++  serviceTier?: 'default' | 'fast'
+   /** Prompt-cache retention preference. */
+   cacheRetention?: CacheRetention
+   /** Streaming transport preference. */
+@@ -3167,6 +3169,28 @@ export type HelperLaunch = {
+ ```
+ <!-- END GENERATED config-catalog:@deepseek-ai/dsh-ssh -->
+ 
++<!-- BEGIN GENERATED config-catalog:@deepseek-ai/dsh-starbridge -->
++<a id="deepseek-aidsh-starbridge"></a>
++
++## `@deepseek-ai/dsh-starbridge`
++
++- `inject`: `llm` · `credentials` · `authorization` · `settings`
++- `refs`: `Volatile` (`@deepseek-ai/cordis`)
++- `source`: [`packages/llm/starbridge/src/index.ts:25`](../packages/llm/starbridge/src/index.ts)
++
++```ts config-catalog
++/** Resolved Starbridge configuration. */
++export interface Config {
++  /** Processing tier used by subsequent Responses requests. */
++  serviceTier: Volatile<'default' | 'fast'>
++  /** Maximum browser authorization lifetime in milliseconds. */
++  signInTimeoutMs: number
++  /** Maximum refresh or revocation request lifetime in milliseconds. */
++  requestTimeoutMs: number
++}
++```
++<!-- END GENERATED config-catalog:@deepseek-ai/dsh-starbridge -->
++
+ <!-- BEGIN GENERATED config-catalog:@deepseek-ai/dsh-storage-domain -->
+ <a id="deepseek-aidsh-storage-domain"></a>
+ 
+@@ -4647,6 +4671,7 @@ export interface Config {
+ | `@deepseek-ai/dsh-client-ui-dockkit` | — | [`packages/client/ui-dockkit/src/index.ts`](../packages/client/ui-dockkit/src/index.ts) |
+ | `@deepseek-ai/dsh-client-ui-primitives` | — | [`packages/client/ui-primitives/src/index.ts`](../packages/client/ui-primitives/src/index.ts) |
+ | `@deepseek-ai/dsh-client-ui-slots` | — | [`packages/client/ui-slots/src/index.ts`](../packages/client/ui-slots/src/index.ts) |
++| `@deepseek-ai/dsh-client-ui-starbridge` | — | [`packages/client/ui-starbridge/src/index.ts`](../packages/client/ui-starbridge/src/index.ts) |
+ | `@deepseek-ai/dsh-client-web` | — | [`packages/client/web/src/index.ts`](../packages/client/web/src/index.ts) |
+ | `@deepseek-ai/dsh-cmdline` | — | [`packages/boot/cmdline/src/index.ts`](../packages/boot/cmdline/src/index.ts) |
+ | `@deepseek-ai/dsh-deque` | — | [`packages/util/deque/src/index.ts`](../packages/util/deque/src/index.ts) |
+diff --git a/docs/event-producer-consumer.md b/docs/event-producer-consumer.md
+index 9691933dda..c8d5401352 100644
+--- a/docs/event-producer-consumer.md
++++ b/docs/event-producer-consumer.md
+@@ -39,7 +39,7 @@ This matrix shows which packages dispatch each harness-owned event and which pac
+ | `cordis/inspect-query-resolved` | `emit` | [`packages/extensions/cordis-host-runner/src/types.ts:401`](../packages/extensions/cordis-host-runner/src/types.ts) | [`cordis-host-runner`](../packages/extensions/cordis-host-runner) (`emit`) | `remotes` |
+ | `cordis/request-run` | `emit` | [`packages/extensions/cordis-host-runner/src/types.ts:371`](../packages/extensions/cordis-host-runner/src/types.ts) | [`cordis-host-runner`](../packages/extensions/cordis-host-runner) (`emit`) | `remotes` |
+ | `cordis/request-run-resolved` | `emit` | [`packages/extensions/cordis-host-runner/src/types.ts:377`](../packages/extensions/cordis-host-runner/src/types.ts) | [`cordis-host-runner`](../packages/extensions/cordis-host-runner) (`emit`) | `remotes` |
+-| `credentials/record-updated` | `emit` | [`packages/credentials/credentials/src/types.ts:99`](../packages/credentials/credentials/src/types.ts) | [`credentials`](../packages/credentials/credentials) (`events.dispatch`) | [`authorization`](../packages/credentials/authorization), [`deepseek-account-platform`](../packages/credentials/deepseek-account-platform), `remotes` |
++| `credentials/record-updated` | `emit` | [`packages/credentials/credentials/src/types.ts:99`](../packages/credentials/credentials/src/types.ts) | [`credentials`](../packages/credentials/credentials) (`events.dispatch`) | [`authorization`](../packages/credentials/authorization), [`deepseek-account-platform`](../packages/credentials/deepseek-account-platform), `remotes`, [`starbridge`](../packages/llm/starbridge) |
+ | `credentials/reference-updated` | `emit` | [`packages/credentials/credentials/src/types.ts:87`](../packages/credentials/credentials/src/types.ts) | [`credentials`](../packages/credentials/credentials) (`events.dispatch`) | `remotes` |
+ | `deepseek-account/model-sign-in-required` | `emit` | [`packages/credentials/deepseek-account/src/types.ts:95`](../packages/credentials/deepseek-account/src/types.ts) | [`deepseek-account`](../packages/credentials/deepseek-account) (`emit`) | `remotes` |
+ | `deepseek-account/session-expired` | `emit` | [`packages/credentials/deepseek-account/src/types.ts:91`](../packages/credentials/deepseek-account/src/types.ts) | [`deepseek-account-platform`](../packages/credentials/deepseek-account-platform) (`emit`) | `account-controller`, `remotes` |
+@@ -102,7 +102,7 @@ This matrix shows which packages dispatch each harness-owned event and which pac
+ | `internal/service` | - | `gateway` |
+ | `internal/status` | - | [`agent`](../packages/core/agent), `inspector`, `translator`, [`web`](../packages/web/web) |
+ | `internal/update` | - | [`app-boot`](../packages/boot/app-boot) |
+-| `loader/volatile-update` | - | [`llm-deepseek`](../packages/llm/llm-deepseek), [`llm-pi-ai`](../packages/llm/llm-pi-ai), `product-analytics`, `speech-to-text` |
++| `loader/volatile-update` | - | [`llm-deepseek`](../packages/llm/llm-deepseek), [`llm-pi-ai`](../packages/llm/llm-pi-ai), `product-analytics`, `speech-to-text`, [`starbridge`](../packages/llm/starbridge) |
+ | `slots/changed` | `ui-renderer` (`emit`) | - |
+ <!-- END GENERATED event-producer-consumer:undeclared -->
+ 
+diff --git a/docs/event-producer-consumer.zh.md b/docs/event-producer-consumer.zh.md
+index cb8ea84aac..5cf3c58d10 100644
+--- a/docs/event-producer-consumer.zh.md
++++ b/docs/event-producer-consumer.zh.md
+@@ -41,7 +41,7 @@
+ | `cordis/inspect-query-resolved` | `emit` | [`packages/extensions/cordis-host-runner/src/types.ts:401`](../packages/extensions/cordis-host-runner/src/types.ts) | [`cordis-host-runner`](../packages/extensions/cordis-host-runner) (`emit`) | `remotes` |
+ | `cordis/request-run` | `emit` | [`packages/extensions/cordis-host-runner/src/types.ts:371`](../packages/extensions/cordis-host-runner/src/types.ts) | [`cordis-host-runner`](../packages/extensions/cordis-host-runner) (`emit`) | `remotes` |
+ | `cordis/request-run-resolved` | `emit` | [`packages/extensions/cordis-host-runner/src/types.ts:377`](../packages/extensions/cordis-host-runner/src/types.ts) | [`cordis-host-runner`](../packages/extensions/cordis-host-runner) (`emit`) | `remotes` |
+-| `credentials/record-updated` | `emit` | [`packages/credentials/credentials/src/types.ts:99`](../packages/credentials/credentials/src/types.ts) | [`credentials`](../packages/credentials/credentials) (`events.dispatch`) | [`authorization`](../packages/credentials/authorization), [`deepseek-account-platform`](../packages/credentials/deepseek-account-platform), `remotes` |
++| `credentials/record-updated` | `emit` | [`packages/credentials/credentials/src/types.ts:99`](../packages/credentials/credentials/src/types.ts) | [`credentials`](../packages/credentials/credentials) (`events.dispatch`) | [`authorization`](../packages/credentials/authorization), [`deepseek-account-platform`](../packages/credentials/deepseek-account-platform), `remotes`, [`starbridge`](../packages/llm/starbridge) |
+ | `credentials/reference-updated` | `emit` | [`packages/credentials/credentials/src/types.ts:87`](../packages/credentials/credentials/src/types.ts) | [`credentials`](../packages/credentials/credentials) (`events.dispatch`) | `remotes` |
+ | `deepseek-account/model-sign-in-required` | `emit` | [`packages/credentials/deepseek-account/src/types.ts:95`](../packages/credentials/deepseek-account/src/types.ts) | [`deepseek-account`](../packages/credentials/deepseek-account) (`emit`) | `remotes` |
+ | `deepseek-account/session-expired` | `emit` | [`packages/credentials/deepseek-account/src/types.ts:91`](../packages/credentials/deepseek-account/src/types.ts) | [`deepseek-account-platform`](../packages/credentials/deepseek-account-platform) (`emit`) | `account-controller`, `remotes` |
+@@ -104,7 +104,7 @@
+ | `internal/service` | - | `gateway` |
+ | `internal/status` | - | [`agent`](../packages/core/agent), `inspector`, `translator`, [`web`](../packages/web/web) |
+ | `internal/update` | - | [`app-boot`](../packages/boot/app-boot) |
+-| `loader/volatile-update` | - | [`llm-deepseek`](../packages/llm/llm-deepseek), [`llm-pi-ai`](../packages/llm/llm-pi-ai), `product-analytics`, `speech-to-text` |
++| `loader/volatile-update` | - | [`llm-deepseek`](../packages/llm/llm-deepseek), [`llm-pi-ai`](../packages/llm/llm-pi-ai), `product-analytics`, `speech-to-text`, [`starbridge`](../packages/llm/starbridge) |
+ | `slots/changed` | `ui-renderer` (`emit`) | - |
+ <!-- END GENERATED event-producer-consumer:undeclared -->
+ 
+diff --git a/docs/subsystems/llm-streaming.i18n.yaml b/docs/subsystems/llm-streaming.i18n.yaml
+index c5426ddc70..b447253570 100644
+--- a/docs/subsystems/llm-streaming.i18n.yaml
++++ b/docs/subsystems/llm-streaming.i18n.yaml
+@@ -47,3 +47,6 @@
+ /llm-streaming/service-and-provider-contracts:
+   en: 8dc79d4cc82824c2
+   zh: 3ebabd3a117ad717
++/llm-streaming/chatgpt-account-state:
++  en: 8a87678a2418c4df
++  zh: 1ce0b5e4b2501b90
+diff --git a/docs/subsystems/llm-streaming.md b/docs/subsystems/llm-streaming.md
+index 4936ba4ae8..d86ef69b47 100644
+--- a/docs/subsystems/llm-streaming.md
++++ b/docs/subsystems/llm-streaming.md
+@@ -906,6 +906,10 @@ declare abstract class LlmAdapter {
+ 
+ `ContentBlockType` (the key set the `index`-correlated blocks carry) derives from [`ContentBlockMap`](#content-blocks-and-messages) above.
+ 
++## ChatGPT account state
++
++`ChatGptView` contains saved account labels (`id`, `email`, `signedIn`), nullable `activeId`, processing `serviceTier` (`default` or `fast`), and a nullable authorization attempt (`id`, browser `url`, and `waiting`, `complete`, `cancelled` or `failed` status). `ChatGptAccountId` brands an issued OAuth registration; `ChatGptAttemptId` brands one pending authorization. The `starbridge` Remote stream publishes this credential-free state and replaces it after reconnect. [Starbridge](../../packages/llm/starbridge/README.md) owns authorization, storage and request behavior.
++
+ <!-- BEGIN GENERATED cordis-surface (gen-cordis-catalog.ts) — do not edit between markers -->
+ 
+ <a id="cordis-surface"></a>
+@@ -914,6 +918,64 @@ declare abstract class LlmAdapter {
+ 
+ Generated from source by `scripts/gen-cordis-catalog.ts` (verified fresh by `pnpm run verify-cordis-catalog` in doc-sync; regenerate with `pnpm run gen-cordis-catalog`) — the language sides differ only in locale-specific paired document paths. Signature blocks use a `ts cordis-catalog` fence and keep the original source JSDoc; dispatch modes are defined in the [primer](../cordis-primer.md#dispatch-modes), and the framework-inherited `ctx` API lives in [cordis-api/inherited.md](../cordis-api/inherited.md).
+ 
++<a id="ctxchatgpt--chatgptcontroller"></a>
++
++### `ctx.chatGpt` — `ChatGptController`
++
++One installation's ChatGPT registrations; all token-bearing operations stay on the Host.
++
++```ts cordis-catalog
++/**
++ * Observe safe account state until the subscriber disconnects.
++ * @param signal - subscriber lifetime.
++ * @returns initial state and committed changes.
++ */
++@Remote({ mode: 'stream' }) async *watch(signal: AbortSignal): AsyncIterable<ChatGptView>
++
++/**
++ * Read account labels without exposing credential material.
++ * @returns saved identities and pending login state without tokens.
++ */
++@Remote async getState(): Promise<ChatGptView>
++
++/**
++ * Start registration or reauthorize a saved account. Existing active credentials survive failure.
++ * @param accountId - saved registration, or null to add an account.
++ * @returns state once the browser URL is available or the attempt has failed.
++ */
++@Remote async startSignIn(accountId: ChatGptAccountId | null): Promise<ChatGptView>
++
++/**
++ * Cancel the matching browser attempt and await its cleanup.
++ * @param attemptId - attempt owned by this UI.
++ * @returns state after callback cleanup and any admitted commit.
++ */
++@Remote async cancelSignIn(attemptId: ChatGptAttemptId): Promise<ChatGptView>
++
++/**
++ * Select a saved session for subsequent model requests.
++ * @param accountId - signed-in registration to use for subsequent requests.
++ * @returns committed state.
++ */
++@Remote async selectAccount(accountId: ChatGptAccountId): Promise<ChatGptView>
++
++/**
++ * Clear the selected account's tokens and attempt remote revocation; retain its registration.
++ * @param accountId - registration to sign out.
++ * @returns whether the issuer confirmed revocation; false requires the user to disconnect in ChatGPT Settings.
++ */
++@Remote async signOut(accountId: ChatGptAccountId): Promise<boolean>
++
++/**
++ * Read or refresh the active account under the shared cross-process credential lock.
++ * @param signal - model request lifetime.
++ * @returns access token for the fixed official Responses endpoint only.
++ */
++async accessToken(signal?: AbortSignal): Promise<string>
++```
++
++Source: [`packages/llm/starbridge/src/chatgpt.ts`](../../packages/llm/starbridge/src/chatgpt.ts)
++
+ <a id="ctxdeepseekllmapiextensions--deepseekllmapiextensionregistry"></a>
+ 
+ ### `ctx.deepseekLlmApiExtensions` — `DeepSeekLlmApiExtensionRegistry`
+diff --git a/docs/subsystems/llm-streaming.zh.md b/docs/subsystems/llm-streaming.zh.md
+index 47d7c0df31..1cb95258e7 100644
+--- a/docs/subsystems/llm-streaming.zh.md
++++ b/docs/subsystems/llm-streaming.zh.md
+@@ -912,6 +912,10 @@ declare abstract class LlmAdapter {
+ 
+ `ContentBlockType`（带 `index` 关联的块所携带的键集合）从上文的 [`ContentBlockMap`](#content-blocks-and-messages) 派生。
+ 
++## ChatGPT 账号状态
++
++`ChatGptView` 包含已保存账号标签（`id`、`email`、`signedIn`）、可空的 `activeId`、处理档位 `serviceTier`（`default` 或 `fast`），以及可空的授权尝试（`id`、浏览器 `url` 和 `waiting`、`complete`、`cancelled` 或 `failed` 状态）。`ChatGptAccountId` 标记已颁发的 OAuth 注册；`ChatGptAttemptId` 标记一次待完成授权。`starbridge` Remote 流发布不含凭据的状态，并在重连后替换状态。[星桥](../../packages/llm/starbridge/README.zh.md)负责授权、存储和请求行为。
++
+ <!-- BEGIN GENERATED cordis-surface (gen-cordis-catalog.ts) — do not edit between markers -->
+ 
+ <a id="cordis-surface"></a>
+@@ -920,6 +924,64 @@ declare abstract class LlmAdapter {
+ 
+ Generated from source by `scripts/gen-cordis-catalog.ts` (verified fresh by `pnpm run verify-cordis-catalog` in doc-sync; regenerate with `pnpm run gen-cordis-catalog`) — the language sides differ only in locale-specific paired document paths. Signature blocks use a `ts cordis-catalog` fence and keep the original source JSDoc; dispatch modes are defined in the [primer](../cordis-primer.zh.md#dispatch-modes), and the framework-inherited `ctx` API lives in [cordis-api/inherited.md](../cordis-api/inherited.md).
+ 
++<a id="ctxchatgpt--chatgptcontroller"></a>
++
++### `ctx.chatGpt` — `ChatGptController`
++
++One installation's ChatGPT registrations; all token-bearing operations stay on the Host.
++
++```ts cordis-catalog
++/**
++ * Observe safe account state until the subscriber disconnects.
++ * @param signal - subscriber lifetime.
++ * @returns initial state and committed changes.
++ */
++@Remote({ mode: 'stream' }) async *watch(signal: AbortSignal): AsyncIterable<ChatGptView>
++
++/**
++ * Read account labels without exposing credential material.
++ * @returns saved identities and pending login state without tokens.
++ */
++@Remote async getState(): Promise<ChatGptView>
++
++/**
++ * Start registration or reauthorize a saved account. Existing active credentials survive failure.
++ * @param accountId - saved registration, or null to add an account.
++ * @returns state once the browser URL is available or the attempt has failed.
++ */
++@Remote async startSignIn(accountId: ChatGptAccountId | null): Promise<ChatGptView>
++
++/**
++ * Cancel the matching browser attempt and await its cleanup.
++ * @param attemptId - attempt owned by this UI.
++ * @returns state after callback cleanup and any admitted commit.
++ */
++@Remote async cancelSignIn(attemptId: ChatGptAttemptId): Promise<ChatGptView>
++
++/**
++ * Select a saved session for subsequent model requests.
++ * @param accountId - signed-in registration to use for subsequent requests.
++ * @returns committed state.
++ */
++@Remote async selectAccount(accountId: ChatGptAccountId): Promise<ChatGptView>
++
++/**
++ * Clear the selected account's tokens and attempt remote revocation; retain its registration.
++ * @param accountId - registration to sign out.
++ * @returns whether the issuer confirmed revocation; false requires the user to disconnect in ChatGPT Settings.
++ */
++@Remote async signOut(accountId: ChatGptAccountId): Promise<boolean>
++
++/**
++ * Read or refresh the active account under the shared cross-process credential lock.
++ * @param signal - model request lifetime.
++ * @returns access token for the fixed official Responses endpoint only.
++ */
++async accessToken(signal?: AbortSignal): Promise<string>
++```
++
++Source: [`packages/llm/starbridge/src/chatgpt.ts`](../../packages/llm/starbridge/src/chatgpt.ts)
++
+ <a id="ctxdeepseekllmapiextensions--deepseekllmapiextensionregistry"></a>
+ 
+ ### `ctx.deepseekLlmApiExtensions` — `DeepSeekLlmApiExtensionRegistry`
+diff --git a/docs/user/develop/practice/llm-adapter.i18n.yaml b/docs/user/develop/practice/llm-adapter.i18n.yaml
+index 3bfd570184..ea8e0e0ed7 100644
+--- a/docs/user/develop/practice/llm-adapter.i18n.yaml
++++ b/docs/user/develop/practice/llm-adapter.i18n.yaml
+@@ -8,6 +8,9 @@
+ /llm-adapters/overview:
+   en: 613076de2e5c7c2d
+   zh: 9df5bf6bca93267f
++/llm-adapters/understand-the-design-first:
++  en: 15181b0c1b1bc096
++  zh: 350cb950eef79a34
+ /llm-adapters/minimal-implementation:
+   en: 2eeb1c65c2b1e67b
+   zh: 0dbee75ec52aa2d5
+diff --git a/docs/user/develop/practice/llm-adapter.md b/docs/user/develop/practice/llm-adapter.md
+index 32e412b10a..ed1156dcdb 100644
+--- a/docs/user/develop/practice/llm-adapter.md
++++ b/docs/user/develop/practice/llm-adapter.md
+@@ -8,6 +8,41 @@ This guide connects a new LLM provider to Harness.
+ 
+ An LLM adapter extends `LlmAdapter` and implements `stream()`, translating Harness's provider-neutral request into a provider API call and translating the response back into Harness chunks.
+ 
++## Understand the design first
++
++`LlmAdapter` translates one model call. It does not manage sessions, decide when to call a model, or execute tools.
++
++```mermaid
++flowchart LR
++  A["Agent loop"] --> B["LlmRuntime"]
++  B --> C["LlmAdapter"]
++  C --> D["Provider API"]
++  D --> C
++  C --> B
++  B --> A
++```
++
++| Component | Responsibility |
++|---|---|
++| Agent loop | Decides when to request a model and handles tool calls returned by the model |
++| `LlmRuntime` | Selects an adapter by `provider` and validates model capabilities and request configuration |
++| `LlmAdapter` | Converts requests, calls the provider API, and emits the shared response chunks |
++| Provider API | Performs the actual model inference |
++
++One request follows these steps:
++
++1. `LlmAdapter` receives `GenerateOptions`.
++2. The adapter converts messages, tools, and generation parameters into the provider request format.
++3. The adapter starts one streaming API request.
++4. The adapter converts provider data into `StreamChunk` values.
++5. The adapter ends the call with `finish`.
++
++Keep three boundaries in mind:
++
++- One `stream()` call represents one provider attempt; policy at the agent-step boundary handles retries.
++- Model-visible history comes from the session log; the adapter does not keep its own conversation copy.
++- Provider-specific fields stay inside the adapter; its public interface uses only Harness types.
++
+ ## Minimal implementation
+ 
+ ```ts
+diff --git a/docs/user/develop/practice/llm-adapter.zh.md b/docs/user/develop/practice/llm-adapter.zh.md
+index bfa9842ce5..c9420487e6 100644
+--- a/docs/user/develop/practice/llm-adapter.zh.md
++++ b/docs/user/develop/practice/llm-adapter.zh.md
+@@ -8,6 +8,41 @@
+ 
+ LLM 适配器是一个继承 `LlmAdapter` 并实现 `stream()` 方法的类，它会将 Harness 的提供方无关请求转换为具体提供方的 API 调用，并将响应转换回 Harness 分片。
+ 
++## 先理解设计
++
++`LlmAdapter` 只负责翻译一次模型调用。它不管理会话、不决定何时调用模型，也不执行工具。
++
++```mermaid
++flowchart LR
++  A["Agent loop"] --> B["LlmRuntime"]
++  B --> C["LlmAdapter"]
++  C --> D["Provider API"]
++  D --> C
++  C --> B
++  B --> A
++```
++
++| 组件 | 责任 |
++|---|---|
++| Agent loop | 决定何时请求模型，并处理模型返回的工具调用 |
++| `LlmRuntime` | 根据 `provider` 选择适配器，并校验模型能力与请求配置 |
++| `LlmAdapter` | 转换请求、调用提供方 API，并生成统一的响应分片 |
++| Provider API | 执行实际的模型推理 |
++
++一次请求按以下顺序流动：
++
++1. `LlmAdapter` 接收 `GenerateOptions`。
++2. 适配器把消息、工具和生成参数转换为提供方的请求格式。
++3. 适配器发起一次流式 API 请求。
++4. 适配器把提供方返回的数据转换为 `StreamChunk`。
++5. 适配器以 `finish` 结束本次调用。
++
++设计时记住三个边界：
++
++- 一次 `stream()` 调用只对应一次提供方尝试；重试由 agent 步骤边界上的策略处理。
++- 模型可见历史来自会话日志，适配器不保存自己的对话副本。
++- 提供方特有字段留在适配器内部，对外只使用 Harness 的公共类型。
++
+ ## 最小实现
+ 
+ ```ts
+diff --git a/packages/client/ui-settings-models/README.i18n.yaml b/packages/client/ui-settings-models/README.i18n.yaml
+index a5c0917a25..75b03d466f 100644
+--- a/packages/client/ui-settings-models/README.i18n.yaml
++++ b/packages/client/ui-settings-models/README.i18n.yaml
+@@ -6,8 +6,8 @@
+   en: d1bc4d9ef67bfb19
+   zh: d095e4dc76f1c5e0
+ /deepseek-ai-dsh-client-ui-settings-models:
+-  en: 0db6fa836e1ff511
+-  zh: 0e2968763e1fb7a5
++  en: 00e79f62b5f41d4b
++  zh: 3eeeec154cfc324a
+ /deepseek-ai-dsh-client-ui-settings-models/summary:
+   en: 51252c1e9fa6da0a
+   zh: 227b54d7898417fa
+@@ -26,6 +26,9 @@
+ /deepseek-ai-dsh-client-ui-settings-models/use-this-package/adding-and-deleting-providers:
+   en: 9d533c65c82cd4a4
+   zh: 0a5da334e127c035
++/deepseek-ai-dsh-client-ui-settings-models/use-this-package/chatgpt-accounts:
++  en: fd3d16bca9649e9e
++  zh: edaf9014680f0fe7
+ /deepseek-ai-dsh-client-ui-settings-models/use-this-package/first-run-dialogs:
+   en: 589397a35f82244e
+   zh: 342fbceee2c173a2
+diff --git a/packages/client/ui-settings-models/README.md b/packages/client/ui-settings-models/README.md
+index def38dbba2..16dc44dade 100644
+--- a/packages/client/ui-settings-models/README.md
++++ b/packages/client/ui-settings-models/README.md
+@@ -7,6 +7,8 @@ kind: "package-reference"
+ 
+ English | [中文](README.zh.md)
+ 
++ChatGPT browser authorization and Fast controls are provided by [Starbridge](../../llm/starbridge/README.md).
++
+ Desktop product events use the optional [product analytics service](../product-analytics/README.md); ordinary Web interactions are excluded.
+ 
+ ## Summary
+@@ -39,6 +41,7 @@ After Apply closes an editor, its saved status appears when the current provider
+ 
+ Host configuration `credentialOnboarding` defaults to `true`. The Electron preload marker suppresses automatic credential onboarding and the Web welcome notice; Models settings and explicit API-key editing remain available. The [account plugin](../ui-settings-account/README.md#desktop-onboarding) owns the Desktop introduction. Other native shells can disable only the credential step with `credentialOnboarding: false`. Host publishes this public boolean through `webserver/index-inject`, and Client validates it before registering dialogs. It is page initialization data, not a durable completion marker.
+ 
++
+ ### API keys
+ 
+ API-key inputs start empty and use `autocomplete="new-password"` to ask browsers not to autofill saved login passwords.
+@@ -57,6 +60,9 @@ Expand **Customized settings → Model options** to edit each model. Both provid
+ 
+ **Add model provider** is the one entry to the add card, offered while any editor-backed settings namespace is mounted and enabled while either mode below can proceed. The card opens on a segmented mode switch with a one-line purpose beneath it: **Third-party model provider** carries the dormant-directory provider select over the provider editor — a bare-mounted `llm-pi-ai` offers its whole installed catalog before any route exists — and **Custom model API** carries the create form for a route pi-ai does not ship: a relay, a self-hosted server, or any other OpenAI- or Anthropic-compatible endpoint. A mode is offered only while its namespace is mounted; with one mode the card shows that form alone under the mode's name, and a mode whose namespace has nothing left to adopt or no protocol to declare is disabled with the reason as its hover text. A panel mounts the first time its mode is shown and stays mounted, hidden, while the card is open and its mode stays offered, so switching modes discards neither draft; the switch locks while either panel has a write or an endpoint interrogation in flight, since a switch underneath one would orphan its answer. Each tab controls its panel through ids, and closing either panel forgets the catalog draft's target. The custom form asks for a unique **Provider ID**, an endpoint, a protocol, and at least one uniquely-identified model, because nothing can default those. The protocol picker names each protocol by its product name — OpenAI Chat Completions, OpenAI Responses, Anthropic Messages — while the stored value stays the schema identifier; a protocol the adapter adds before this page names it shows that identifier. The endpoint placeholder follows the selected protocol: OpenAI Chat Completions and Responses show `https://gateway.example/v1`, while Anthropic Messages shows `https://gateway.example` because its SDK appends `/v1/messages`. Changing the protocol preserves any address already entered. The endpoint must be a parseable HTTP or HTTPS URL; localhost, IPv4 and IPv6 literals, and custom ports remain valid. A syntax error blocks both discovery and creation at the field, while a request failure remains a separate provider error. **Fetch available models** asks the `llm/discoverModels` Remote about the endpoint the form shows, so adding a provider is one pass instead of save-then-return; the reply opens a searchable picker rather than being written, and nothing is written until **Add selected**. Each candidate displays its original model id in a monospace font to distinguish models with the same name. Rows stay on one line; hovering reveals the model name, falling back to the full id when no name is supplied. Selection and configuration retain the original model id. Each selected candidate copies its id, display name, context window, output-token cap, and disclosed input types into the editable row when disclosed, while an existing row retains its user-tuned values. Search matches model ids and optional display names without clearing hidden selections. **Select all** adds the visible results, while **Deselect all** clears the entire selection so hidden results cannot be adopted accidentally. A row is deletable only when the user layer alone carries it (removal restores the composition base), and its confirmation dialog names the provider.
+ 
++### ChatGPT accounts
++
++
+ ### First-run dialogs
+ 
+ After the versioned notice step completes, the DeepSeek step projects first-run readiness from the same joined snapshot. ANY provider the user can already reach ends it without rendering; only a user with none is asked for the official DeepSeek key. Configure later completes only this coordinator pass, and an absent adapter, inactive route, failed join, read-only deployment, or unusable capability completes the step without rendering — Models remains the diagnostic surface.
+diff --git a/packages/client/ui-settings-models/README.zh.md b/packages/client/ui-settings-models/README.zh.md
+index 0af8ee6abb..d00cfdb7ba 100644
+--- a/packages/client/ui-settings-models/README.zh.md
++++ b/packages/client/ui-settings-models/README.zh.md
+@@ -7,6 +7,8 @@ kind: "package-reference"
+ 
+ [English](README.md) | 中文
+ 
++ChatGPT 浏览器授权与 Fast 设置由[星桥](../../llm/starbridge/README.zh.md)提供。
++
+ 桌面端产品事件使用可选的[产品埋点服务](../product-analytics/README.zh.md)，不包含普通 Web 交互。
+ 
+ ## 概述
+@@ -39,6 +41,7 @@ kind: "package-reference"
+ 
+ Host 配置 `credentialOnboarding` 默认为 `true`。Electron preload 标记会抑制自动凭证引导和 Web 欢迎须知；模型设置页与显式 API Key 编辑仍然可用。[账号插件](../ui-settings-account/README.zh.md#desktop-onboarding)负责 Desktop 引导。其他原生壳可以通过 `credentialOnboarding: false` 仅禁用凭证步骤。Host 通过 `webserver/index-inject` 发布这个公开的布尔值，Client 在注册弹窗前校验它。它是页面初始化数据，不是持久化的完成标记。
+ 
++
+ ### API 密钥
+ 
+ API 密钥输入框初始为空，并通过 `autocomplete="new-password"` 请求浏览器不要自动填入已保存的登录密码。
+@@ -57,6 +60,9 @@ API 密钥输入框初始为空，并通过 `autocomplete="new-password"` 请求
+ 
+ **添加模型提供商**是新增卡片的唯一入口：只要任一带编辑器的设置 namespace 已挂载就会出现，下述两种方式任一可继续时才可点击。卡片打开后顶部是分段式的方式切换，下方一行小字说明所选方式的用途：**第三方模型提供商**承载休眠目录提供商选择框与提供商编辑器——裸挂载的 `llm-pi-ai` 在任何路由存在之前就能提供其完整的已安装 catalog；**自定义模型 API**承载为 pi-ai 不提供的路由（中转站、自部署服务或其他兼容 OpenAI / Anthropic 协议的接口）准备的创建表单。某种方式只在其 namespace 已挂载时提供；只剩一种方式时卡片以该方式为标题直接显示表单；namespace 已无可采用的提供商或没有可声明的协议时，对应方式会被禁用并把原因作为悬停提示。面板在其方式首次显示时挂载，之后在卡片打开且该方式仍被提供期间保持挂载但隐藏，因此切换方式不会丢掉任何一边的草稿；任一面板有写入或端点探测进行中时滑块锁定，因为此时切换会让结果落到看不见的面板上。每个 tab 通过 id 控制其面板，关闭任一面板都会忘记目录草稿的目标。自定义表单会索要唯一的 **Provider ID**、端点、协议与至少一个可唯一识别的模型，因为没有东西能为它们兜底。协议选择框以产品名称显示各协议——OpenAI Chat Completions、OpenAI Responses、Anthropic Messages——存储的值仍是 schema 标识符；适配器新增而本页尚未命名的协议直接显示其标识符。端点占位示例随所选协议变化：OpenAI Chat Completions 与 Responses 显示 `https://gateway.example/v1`，Anthropic Messages 显示 `https://gateway.example`，因为其 SDK 会追加 `/v1/messages`。切换协议会保留已输入的地址。端点必须是可解析的 HTTP 或 HTTPS URL；localhost、IPv4 与 IPv6 字面地址以及自定义端口仍然有效。语法错误会在字段处阻止询问与创建，请求失败则继续作为独立的提供商错误显示。**获取可用模型**通过 `llm/discoverModels` Remote 查询表单显示的端点，因此新增提供商一次即可完成，而非先保存再返回；回复打开的是可搜索选择器而非直接写入，只有点击**添加所选**才会写入。候选项使用等宽字体显示原始模型 id，以区分同名模型。每行保持单行，悬停可查看模型名称，未提供名称时回退到完整 id。勾选与配置仍使用原始模型 id。每个选中候选会在提供商公布相应信息时，把 id、显示名、上下文窗口、最大输出 token 数和已公布的输入类型复制进可编辑行；已经存在的行保留用户调整过的值。搜索会匹配模型 id 与可选显示名称，且不会清除隐藏项的勾选状态。**全选**会加入可见结果，而**取消全选**会清空全部勾选，以免意外采用隐藏结果。只有用户层单独携带某行时，该行才可删除（删除会恢复组合基线），其确认对话框会指名该提供商。
+ 
++### ChatGPT 账号
++
++
+ ### 首次运行弹窗
+ 
+ 版本化声明步骤完成后，DeepSeek 步骤从同一份合并快照投影首次运行就绪状态。用户已经能够到达的**任何**提供商都会直接结束该步骤、不做渲染；只有没有任何提供商的用户才会被询问官方 DeepSeek 密钥。「稍后配置」只完成这次协调器遍历；适配器缺失、路由不活动、合并失败、只读部署或能力不可用时，该步骤不渲染即完成——Models 仍是诊断界面。
+diff --git a/packages/extensions/cordis-client-runner/src/client/slot-catalog.ts b/packages/extensions/cordis-client-runner/src/client/slot-catalog.ts
+index e134f1d984..265c984d35 100644
+--- a/packages/extensions/cordis-client-runner/src/client/slot-catalog.ts
++++ b/packages/extensions/cordis-client-runner/src/client/slot-catalog.ts
+@@ -2609,7 +2609,9 @@ export const CLIENT_SLOT_API: readonly ClientSlotEntry[] = [
+     hookContext: '',
+     slotInject: '',
+     declaredBy: 'an entry in \'settings.section\' (client-ui-settings-models), so it exists while that entry is mounted',
+-    occupants: [],
++    occupants: [
++      'client-ui-starbridge ChatGptCard id \'starbridge\'',
++    ],
+     replaceRisk: 'none',
+     example: 'return {\n  inject: [\'slots\'],\n  apply(ctx) {\n    ctx.slots.inject(\'settings.models.footer\', () => ctx.slots.register(\n      { name: \'settings.models.footer\', id: \'my-entry\', order: 100, label: \'My entry\' },\n      () => React.createElement(\'div\', null, \'hello\'),\n    ))\n  },\n}',
+     source: 'packages/client/ui-settings-models/src/client/slot-contract.ts:40',
+diff --git a/packages/extensions/tool-cordis/src/api-catalog.ts b/packages/extensions/tool-cordis/src/api-catalog.ts
+index cac34cc692..4e9afd81bb 100644
+--- a/packages/extensions/tool-cordis/src/api-catalog.ts
++++ b/packages/extensions/tool-cordis/src/api-catalog.ts
+@@ -561,6 +561,55 @@ export const SERVICE_API: readonly ServiceApiEntry[] = [
+       },
+     ],
+   },
++  {
++    key: 'chatGpt',
++    summary: 'One installation\'s ChatGPT registrations; all token-bearing operations stay on the Host.',
++    description: 'One installation\'s ChatGPT registrations; all token-bearing operations stay on the Host.',
++    methods: [
++      {
++        signature: '@Remote({ mode: \'stream\' }) async *watch(signal: AbortSignal): AsyncIterable<ChatGptView>',
++        description: 'Observe safe account state until the subscriber disconnects.',
++        parameters: [{ name: 'signal', description: 'subscriber lifetime.' }],
++        returns: 'initial state and committed changes.',
++      },
++      {
++        signature: '@Remote async getState(): Promise<ChatGptView>',
++        description: 'Read account labels without exposing credential material.',
++        parameters: [],
++        returns: 'saved identities and pending login state without tokens.',
++      },
++      {
++        signature: '@Remote async startSignIn(accountId: ChatGptAccountId | null): Promise<ChatGptView>',
++        description: 'Start registration or reauthorize a saved account. Existing active credentials survive failure.',
++        parameters: [{ name: 'accountId', description: 'saved registration, or null to add an account.' }],
++        returns: 'state once the browser URL is available or the attempt has failed.',
++      },
++      {
++        signature: '@Remote async cancelSignIn(attemptId: ChatGptAttemptId): Promise<ChatGptView>',
++        description: 'Cancel the matching browser attempt and await its cleanup.',
++        parameters: [{ name: 'attemptId', description: 'attempt owned by this UI.' }],
++        returns: 'state after callback cleanup and any admitted commit.',
++      },
++      {
++        signature: '@Remote async selectAccount(accountId: ChatGptAccountId): Promise<ChatGptView>',
++        description: 'Select a saved session for subsequent model requests.',
++        parameters: [{ name: 'accountId', description: 'signed-in registration to use for subsequent requests.' }],
++        returns: 'committed state.',
++      },
++      {
++        signature: '@Remote async signOut(accountId: ChatGptAccountId): Promise<boolean>',
++        description: 'Clear the selected account\'s tokens and attempt remote revocation; retain its registration.',
++        parameters: [{ name: 'accountId', description: 'registration to sign out.' }],
++        returns: 'whether the issuer confirmed revocation; false requires the user to disconnect in ChatGPT Settings.',
++      },
++      {
++        signature: 'async accessToken(signal?: AbortSignal): Promise<string>',
++        description: 'Read or refresh the active account under the shared cross-process credential lock.',
++        parameters: [{ name: 'signal', description: 'model request lifetime.' }],
++        returns: 'access token for the fixed official Responses endpoint only.',
++      },
++    ],
++  },
+   {
+     key: 'claudeCodeMods',
+     summary: 'The bridge service: loaded mods, their hooks, and the harness listeners that raise their events.',
+@@ -4869,6 +4918,22 @@ export const TYPE_API: readonly TypeApiEntry[] = [
+     name: 'ChangeResult',
+     declaration: 'export interface ChangeResult {\n    changed: boolean;\n    application: \'applied\' | \'restart-required\' | \'overridden\' | \'failed\' | \'cancelled\';\n    stage: \'install\' | \'enable\' | \'remove\';\n    target: string;\n    enabled?: boolean;\n    error?: ManagementError;\n    warnings?: string[];\n    packageResult?: PackageResult;\n    bundle?: string;\n    version?: string;\n    pendingBuilds?: string[];\n    approvedBuilds?: string[];\n    registries?: Registry[];\n    failedAt?: \'registry\' | \'spec-host\';\n}',
+   },
++  {
++    name: 'ChatGptAccountId',
++    declaration: 'export type ChatGptAccountId = Branded<\'ChatGptAccountId\'>;',
++  },
++  {
++    name: 'ChatGptAccountView',
++    declaration: 'export interface ChatGptAccountView {\n    id: ChatGptAccountId;\n    email: string;\n    signedIn: boolean;\n}',
++  },
++  {
++    name: 'ChatGptAttemptId',
++    declaration: 'export type ChatGptAttemptId = Branded<\'ChatGptAttemptId\'>;',
++  },
++  {
++    name: 'ChatGptView',
++    declaration: 'export interface ChatGptView {\n    serviceTier: \'default\' | \'fast\';\n    accounts: ChatGptAccountView[];\n    activeId: ChatGptAccountId | null;\n    attempt: {\n        id: ChatGptAttemptId;\n        url: string | null;\n        status: \'waiting\' | \'complete\' | \'cancelled\' | \'failed\';\n    } | null;\n}',
++  },
+   {
+     name: 'ClientArtifactBaseline',
+     declaration: 'export interface ClientArtifactBaseline {\n    readonly path: string;\n    readonly mtimeMs: number;\n    readonly ctimeMs: number;\n    readonly size: number;\n}',
+diff --git a/packages/llm/llm-pi-ai/README.i18n.yaml b/packages/llm/llm-pi-ai/README.i18n.yaml
+index 4757fa8164..6718872618 100644
+--- a/packages/llm/llm-pi-ai/README.i18n.yaml
++++ b/packages/llm/llm-pi-ai/README.i18n.yaml
+@@ -6,8 +6,8 @@
+   en: 8a6ec0a589e6fd18
+   zh: e85fc352c9cba373
+ /deepseek-ai-dsh-llm-pi-ai:
+-  en: 33763dd0a848143d
+-  zh: 82743942bc6df660
++  en: d34bdf6b3260e18e
++  zh: a8a8783e354342ac
+ /deepseek-ai-dsh-llm-pi-ai/summary:
+   en: ee82d88fee1332d6
+   zh: 3e66b494e4844f97
+@@ -15,7 +15,7 @@
+   en: d152484eb41ac6b4
+   zh: 09388d293f9be9cb
+ /deepseek-ai-dsh-llm-pi-ai/use-this-package:
+-  en: 86cf1940fb8bb1dc
++  en: ab16758e77114caa
+   zh: 862c10b2ca45a893
+ /deepseek-ai-dsh-llm-pi-ai/use-this-package/when-to-choose-it:
+   en: f3b761c7c7ecb82f
+diff --git a/packages/llm/llm-pi-ai/README.md b/packages/llm/llm-pi-ai/README.md
+index aa3b657f15..181c61f988 100644
+--- a/packages/llm/llm-pi-ai/README.md
++++ b/packages/llm/llm-pi-ai/README.md
+@@ -7,6 +7,8 @@ kind: "package-reference"
+ 
+ English | [中文](README.zh.md)
+ 
++ChatGPT browser authorization is owned by [Starbridge](../starbridge/README.md).
++
+ ## Summary
+ 
+ `@deepseek-ai/dsh-llm-pi-ai` routes model requests to multiple pi-ai providers, OpenAI-compatible gateways, or self-hosted servers from one configuration. Installed pi-ai providers supply endpoint, protocol, and model-catalog defaults; custom routes can declare those values without code changes. Profiles and credentials are resolved for each request, so settings changes take effect on the next request without a restart. Supported providers can use stored OAuth or interactive-key sign-in with cross-process refresh locking. The package may start with no routes and activate when user settings add them.
+@@ -25,7 +27,7 @@ English | [中文](README.zh.md)
+ <a id="use-this-package"></a>
+ ## Use this package
+ 
+-Mount this plugin when a composition routes model requests through pi-ai's provider catalogs or through gateways that pi-ai's installed catalog does not describe. The `providers` dictionary is the whole configuration surface: each key is the provider route name a request selects with `GenerateOptions.provider`.
++Mount this plugin when a composition routes model requests through pi-ai's provider catalogs or through gateways that pi-ai's installed catalog does not describe. The `providers` dictionary defines model routes: each key is the provider route name a request selects with `GenerateOptions.provider`.
+ 
+ The adapter accepts the LLM service's [request-only user inputs](../llm/README.md#use-this-package) alongside durable history. User identity and attribution do not enter pi-ai content; assistant replay metadata and tool-call correlation remain attached to durable messages.
+ 
+@@ -90,6 +92,7 @@ Each profile may set a `retryPolicy`; omission uses normal mode with five retrie
+ 
+ The generated [configuration catalog](../../../docs/config-catalog.md#deepseek-aidsh-llm-pi-ai) is the exhaustive source for every accepted field and its JSDoc.
+ 
++
+ ### Sign in to a provider
+ 
+ A provider pi-ai ships a login for can be signed into through the harness authorization seam: the flow offers OAuth or an interactive key prompt (a key is typed into pi-ai's own login prompt, not into the settings form), and the resulting credential is stored in the harness credential store at `llm-pi-ai/<provider id>`. The stored sign-in authenticates its route beneath any `apiKeyEnv` override and refreshes itself under the store's cross-process lock; signing out deletes the stored record. A hand-declared route key outside the record grammar — a lowercase hyphenated identifier — cannot be signed into, because a record write for it refuses with `LlmError('UNSTORABLE_PROVIDER_ID')`; such a route authenticates through `apiKeyEnv` or ambient provider settings instead.
+diff --git a/packages/llm/llm-pi-ai/README.zh.md b/packages/llm/llm-pi-ai/README.zh.md
+index e74a26b012..3bf84acdc5 100644
+--- a/packages/llm/llm-pi-ai/README.zh.md
++++ b/packages/llm/llm-pi-ai/README.zh.md
+@@ -7,6 +7,8 @@ kind: "package-reference"
+ 
+ [English](README.md) | 中文
+ 
++ChatGPT 浏览器授权由[星桥](../starbridge/README.zh.md)提供。
++
+ ## 概述
+ 
+ `@deepseek-ai/dsh-llm-pi-ai` 通过一份配置把模型请求路由到多个 pi-ai 提供方、OpenAI 兼容网关或自托管服务器。已安装的 pi-ai 提供方会提供端点、协议和模型目录默认值；自定义路由可以直接声明这些值，无需修改代码。profile 与凭据按请求解析，因此设置变更会在下一个请求生效，无需重启。受支持的提供方可以使用已存储的 OAuth 或交互式密钥登录，并通过跨进程锁刷新凭据。本包可以在没有路由时启动，并在用户设置添加路由后将其激活。
+@@ -90,6 +92,7 @@ kind: "package-reference"
+ 
+ 生成的[配置目录](../../../docs/config-catalog.zh.md#deepseek-aidsh-llm-pi-ai)是每个受支持字段及其 JSDoc 的穷尽式真源。
+ 
++
+ ### 登录提供方
+ 
+ pi-ai 提供登录的提供方可以通过 harness 授权 seam 登录：流程提供 OAuth 或交互式密钥提示（密钥键入 pi-ai 自己的登录提示，而非设置表单），得到的凭据存储在 harness 凭据存储的 `llm-pi-ai/<provider id>` 记录中。存储的登录在其路由的 `apiKeyEnv` 覆盖之下完成认证，并在存储的跨进程锁下自行刷新；退出登录即删除存储记录。落在记录文法之外——小写连字符标识符——的手工声明路由键无法登录，因为对它的记录写入会以 `LlmError('UNSTORABLE_PROVIDER_ID')` 拒绝；这类路由改用 `apiKeyEnv` 或提供方 ambient 设置认证。
+diff --git a/packages/preset/agent-preset/skills/cordis-composition-reference/references/packages.md b/packages/preset/agent-preset/skills/cordis-composition-reference/references/packages.md
+index 7896c0ad1c..105041b60e 100644
+--- a/packages/preset/agent-preset/skills/cordis-composition-reference/references/packages.md
++++ b/packages/preset/agent-preset/skills/cordis-composition-reference/references/packages.md
+@@ -294,6 +294,7 @@ Every package below exports a Cordis plugin that a bundle patch can name in a Lo
+ | `@deepseek-ai/dsh-llm-pi-ai` | yes | pi-ai-backed DeepSeek adapter for the DeepSeek Harness LLM seam (design-verification twin of dsh-llm-deepseek) |
+ | `@deepseek-ai/dsh-llm-retry` | yes | Provider-routed LLM request retry policy for the DeepSeek Harness |
+ | `@deepseek-ai/dsh-plugin-package-inventory-deepseek` | yes | Active Loader-backed plugin package inventory for official DeepSeek LLM API requests |
++| `@deepseek-ai/dsh-starbridge` | yes | Starbridge ChatGPT authorization and model provider |
+ | `@deepseek-ai/dsh-token-meter` | yes | Replay-aware token measurement service (ctx.tokenMeter) for the DeepSeek Harness |
+ 
+ ## lsp
+diff --git a/pnpm-lock.yaml b/pnpm-lock.yaml
+index dfaa16532d..78a9736536 100644
+--- a/pnpm-lock.yaml
++++ b/pnpm-lock.yaml
+@@ -115,12 +115,12 @@ importers:
+       '@types/node':
+         specifier: ^22.20.1
+         version: 22.20.1
+-      '@types/semver':
+-        specifier: ^7.8.0
+-        version: 7.8.0
+       '@types/papaparse':
+         specifier: ^5.5.2
+         version: 5.5.2
++      '@types/semver':
++        specifier: ^7.8.0
++        version: 7.8.0
+       '@types/spdx-expression-parse':
+         specifier: ^4.0.0
+         version: 4.0.0
+@@ -5905,6 +5905,64 @@ importers:
+         specifier: ~18.3.1
+         version: 18.3.31
+ 
++  packages/client/ui-starbridge:
++    dependencies:
++      '@deepseek-ai/schemastery':
++        specifier: link:../../../vendor/schemastery
++        version: link:../../../vendor/schemastery
++    devDependencies:
++      '@deepseek-ai/cordis':
++        specifier: workspace:~
++        version: link:../../../vendor/cordis
++      '@deepseek-ai/dsh-api-remotes':
++        specifier: workspace:*
++        version: link:../../api/remotes
++      '@deepseek-ai/dsh-client-locale':
++        specifier: workspace:*
++        version: link:../locale
++      '@deepseek-ai/dsh-client-product-analytics':
++        specifier: workspace:*
++        version: link:../product-analytics
++      '@deepseek-ai/dsh-client-store':
++        specifier: workspace:*
++        version: link:../store
++      '@deepseek-ai/dsh-client-test-runtime':
++        specifier: workspace:*
++        version: link:../../test-support/client-runtime
++      '@deepseek-ai/dsh-client-ui-primitives':
++        specifier: workspace:*
++        version: link:../ui-primitives
++      '@deepseek-ai/dsh-client-ui-renderer':
++        specifier: workspace:*
++        version: link:../ui-renderer
++      '@deepseek-ai/dsh-client-ui-settings':
++        specifier: workspace:*
++        version: link:../ui-settings
++      '@deepseek-ai/dsh-client-ui-settings-models':
++        specifier: workspace:*
++        version: link:../ui-settings-models
++      '@deepseek-ai/dsh-client-ui-slots':
++        specifier: workspace:*
++        version: link:../ui-slots
++      '@deepseek-ai/dsh-host-webserver':
++        specifier: workspace:*
++        version: link:../../host/webserver
++      '@deepseek-ai/dsh-remote-mock':
++        specifier: workspace:*
++        version: link:../../test-support/remote-mock
++      '@deepseek-ai/dsh-starbridge':
++        specifier: workspace:*
++        version: link:../../llm/starbridge
++      '@deepseek-ai/dsh-util-values':
++        specifier: workspace:*
++        version: link:../../util/values
++      '@types/react':
++        specifier: ~18.3.1
++        version: 18.3.31
++      react:
++        specifier: ^18.2.0
++        version: 18.3.1
++
+   packages/client/ui-subagent:
+     devDependencies:
+       '@deepseek-ai/cordis':
+@@ -10915,6 +10973,73 @@ importers:
+         specifier: workspace:*
+         version: link:../../session/session-projection
+ 
++  packages/llm/starbridge:
++    dependencies:
++      '@deepseek-ai/dsh-brand':
++        specifier: workspace:*
++        version: link:../../util/brand
++      '@deepseek-ai/dsh-llm-pi-ai':
++        specifier: workspace:*
++        version: link:../llm-pi-ai
++      '@deepseek-ai/dsh-util-values':
++        specifier: workspace:*
++        version: link:../../util/values
++      '@deepseek-ai/schemastery':
++        specifier: link:../../../vendor/schemastery
++        version: link:../../../vendor/schemastery
++      '@earendil-works/pi-ai':
++        specifier: ^1.0.2
++        version: 1.0.2(patch_hash=1cc211bc358d30cb58bd975f39c03e296f8a277c3de845514d12f9ae77ebab5f)(@aws-sdk/credential-provider-node@3.972.84)(@modelcontextprotocol/sdk@1.31.0(supports-color@9.4.0)(zod@4.4.3))(@smithy/signature-v4@5.7.4)(supports-color@9.4.0)(undici@8.10.2)(ws@8.21.3)(zod@4.4.3)
++      jose:
++        specifier: ^6.2.3
++        version: 6.2.3
++      zod:
++        specifier: ^4.4.3
++        version: 4.4.3
++    devDependencies:
++      '@deepseek-ai/cordis':
++        specifier: workspace:~
++        version: link:../../../vendor/cordis
++      '@deepseek-ai/cordis-plugin-loader':
++        specifier: workspace:~
++        version: link:../../../vendor/loader
++      '@deepseek-ai/dsh-attachment':
++        specifier: workspace:*
++        version: link:../../attachment/attachment
++      '@deepseek-ai/dsh-authorization':
++        specifier: workspace:*
++        version: link:../../credentials/authorization
++      '@deepseek-ai/dsh-credentials':
++        specifier: workspace:*
++        version: link:../../credentials/credentials
++      '@deepseek-ai/dsh-fs':
++        specifier: workspace:*
++        version: link:../../fs/fs
++      '@deepseek-ai/dsh-http-proxy':
++        specifier: workspace:*
++        version: link:../../util/http-proxy
++      '@deepseek-ai/dsh-launch-environment':
++        specifier: workspace:*
++        version: link:../../util/launch-environment
++      '@deepseek-ai/dsh-llm':
++        specifier: workspace:*
++        version: link:../llm
++      '@deepseek-ai/dsh-llm-deepseek':
++        specifier: workspace:*
++        version: link:../llm-deepseek
++      '@deepseek-ai/dsh-llm-deepseek-api-key':
++        specifier: workspace:*
++        version: link:../llm-deepseek-api-key
++      '@deepseek-ai/dsh-settings':
++        specifier: workspace:*
++        version: link:../../settings/settings
++      '@deepseek-ai/dsh-timeout':
++        specifier: workspace:*
++        version: link:../../util/timeout
++      '@deepseek-ai/dsh-typert-protocol':
++        specifier: workspace:*
++        version: link:../../typert/protocol
++
+   packages/llm/token-meter:
+     dependencies:
+       '@deepseek-ai/dsh-util-values':
+@@ -15641,10 +15766,6 @@ importers:
+ 
+ packages:
+ 
+-  papaparse@5.5.3:
+-    resolution: {integrity: sha512-5QvjGxYVjxO59MGU2lHVYpRWBBtKHnlIAcSe1uNFCkkptUh63NFRj0FJQm7nR67puEruUci/ZkjmEFrjCAyP4A==}
+-
+-
+   '@agentclientprotocol/sdk@1.4.0':
+     resolution: {integrity: sha512-/eufudw+aFY1LKLolT6yFE6UMmYRl7fMJ/DEONSIyR6wI3slHWITBsANRGqXEY8FRzqUxwh7QEaGiZHcJPVThg==}
+     peerDependencies:
+@@ -21701,6 +21822,9 @@ packages:
+   pako@1.0.11:
+     resolution: {integrity: sha512-4hLB8Py4zZce5s4yd9XzopqwVv/yGNhV1Bl8NTmCq1763HeK2+EwVTv+leGeL13Dnh2wfbqowVPXCIO0z4taYw==}
+ 
++  papaparse@5.5.3:
++    resolution: {integrity: sha512-5QvjGxYVjxO59MGU2lHVYpRWBBtKHnlIAcSe1uNFCkkptUh63NFRj0FJQm7nR67puEruUci/ZkjmEFrjCAyP4A==}
++
+   papaparse@5.7.0:
+     resolution: {integrity: sha512-qBGxg/7Q3Kl9Wfhrz2Z74UnvnHTXLNG6jmKJFeBvP2+y4lV7So+7SR62+Zd47JvdrCkX+nDcnr0ObPzek/+6RA==}
+ 
+@@ -23227,9 +23351,6 @@ packages:
+ 
+ snapshots:
+ 
+-  papaparse@5.5.3: {}
+-
+-
+   '@agentclientprotocol/sdk@1.4.0(zod@4.4.3)':
+     dependencies:
+       zod: 4.4.3
+@@ -29443,6 +29564,8 @@ snapshots:
+ 
+   pako@1.0.11: {}
+ 
++  papaparse@5.5.3: {}
++
+   papaparse@5.7.0: {}
+ 
+   parse-ms@4.0.0: {}
+diff --git a/scripts/gen-cordis-catalog.ts b/scripts/gen-cordis-catalog.ts
+index 2c012bde12..a76708ea72 100644
+--- a/scripts/gen-cordis-catalog.ts
++++ b/scripts/gen-cordis-catalog.ts
+@@ -96,6 +96,7 @@ export const SERVICE_PAGE: Record<string, string> = {
+   inspector: 'extensions.md',
+   webServer: 'web-server.md',
+   llm: 'llm-streaming.md',
++  chatGpt: 'llm-streaming.md',
+   lsp: 'lsp.md',
+   messageFeedback: 'feedback.md',
+   sessionFeedback: 'feedback.md',
+@@ -340,6 +341,9 @@ export const LINK_MAP: Readonly<Record<string, string>> = {
+   DeepSeekLlmApiExtensionProvider: 'llm-streaming.md',
+   DeepSeekLlmApiExtensionRequest: 'llm-streaming.md',
+   LlmCallConfig: 'llm-streaming.md',
++  ChatGptView: 'llm-streaming.md',
++  ChatGptAccountId: 'llm-streaming.md',
++  ChatGptAttemptId: 'llm-streaming.md',
+   ConfigureCall: 'llm-streaming.md',
+   LlmModelContext: 'llm-streaming.md',
+   LlmModelReasoningInfo: 'llm-streaming.md',
+diff --git a/scripts/gen-doc-graphs.ts b/scripts/gen-doc-graphs.ts
+index e161b0452c..4d2e161c9f 100644
+--- a/scripts/gen-doc-graphs.ts
++++ b/scripts/gen-doc-graphs.ts
+@@ -412,6 +412,14 @@ const SERVICE_ROLES: ServiceRole[] = [
+     consumers: ['api-settings-controller', 'llm-deepseek', 'llm-pi-ai'],
+     note: 'Configuration carries references to secrets; providers own the values. Consumers resolve per operation, so a rotated credential reaches the very next request; the settings controller exposes value-free views and write-only storage.',
+   },
++  {
++    key: 'chatGpt',
++    pkg: 'starbridge',
++    title: 'ChatGPT account authorization',
++    mode: 'core',
++    consumers: ['starbridge', 'client-ui-starbridge'],
++    note: 'Owns verified local ChatGPT registrations and credential-free Remote state; inference reuses the pi-ai Responses adapter.',
++  },
+   {
+     key: 'deepseekAccount',
+     pkg: 'deepseek-account',
+diff --git a/scripts/product-package-policy.ts b/scripts/product-package-policy.ts
+index 802ce76f48..2c0d9a5c70 100644
+--- a/scripts/product-package-policy.ts
++++ b/scripts/product-package-policy.ts
+@@ -16,6 +16,8 @@ export interface ProductPackagePolicy {
+  * Optional integrations may be reached by an optional bundle without becoming default capabilities.
+  */
+ export const PRODUCT_PACKAGE_POLICY: Readonly<Record<string, ProductPackagePolicy>> = {
++  'packages/llm/starbridge': { category: 'optional', reason: 'Independently installed ChatGPT authorization and model plugin.' },
++  'packages/client/ui-starbridge': { category: 'optional', reason: 'Browser controls distributed by the optional Starbridge bundle.' },
+   'packages/browser-use/browser-use': { category: 'optional', reason: 'Service definition used by explicitly selected browser providers.' },
+   'packages/computer-use/computer-use': { category: 'optional', reason: 'Service definition used by explicitly selected computer providers.' },
+   'packages/lsp/lsp': { category: 'optional', reason: 'Service definition for deployment-configured language servers.' },
+diff --git a/tsconfig.base.json b/tsconfig.base.json
+index 4ad99dbb89..b4f0cc2e66 100644
+--- a/tsconfig.base.json
++++ b/tsconfig.base.json
+@@ -28,6 +28,9 @@
+     // not declaration path aliases, keep each package/vendor source compiled
+     // under its own tsconfig boundary.
+     "paths": {
++      "@deepseek-ai/dsh-client-ui-starbridge": ["./packages/client/ui-starbridge/src/index.ts"],
++      "@deepseek-ai/dsh-client-ui-starbridge/client": ["./packages/client/ui-starbridge/src/client/index.ts"],
++      "@deepseek-ai/dsh-starbridge/types": ["./packages/llm/starbridge/src/chatgpt-types.ts"],
+       "@deepseek-ai/dsh-experimental-session-search": ["./packages/experimental/session-search/src/index.ts"],
+       "@deepseek-ai/dsh-experimental-ralph-bundle": ["./packages/experimental/ralph-bundle/src/index.ts"],
+       "@deepseek-ai/dsh-experimental-terminal-bundle": ["./packages/experimental/terminal-bundle/src/index.ts"],
+@@ -474,6 +477,7 @@
+       "@deepseek-ai/dsh-spill-policy": ["./packages/spill/spill-policy/src"],
+       "@deepseek-ai/dsh-ssh": ["./packages/ssh/ssh/src"],
+       "@deepseek-ai/dsh-ssh-helper-runtime": ["./packages/ssh/ssh-helper-runtime/src"],
++      "@deepseek-ai/dsh-starbridge": ["./packages/llm/starbridge/src"],
+       "@deepseek-ai/dsh-storage": ["./packages/storage/storage/src"],
+       "@deepseek-ai/dsh-storage-domain": ["./packages/storage/storage-domain/src"],
+       "@deepseek-ai/dsh-storage-json": ["./packages/storage/storage-json/src"],
+diff --git a/tsconfig.client.json b/tsconfig.client.json
+index a8f0a9ed96..8f4a9a518f 100644
+--- a/tsconfig.client.json
++++ b/tsconfig.client.json
+@@ -51,6 +51,7 @@
+     "packages/client/*/tests/**/*.host.spec.ts"
+   ],
+   "references": [
++    { "path": "./packages/client/ui-starbridge" },
+     { "path": "./packages/experimental/client-ui-cot-translation/tsconfig.client.json" },
+     { "path": "./packages/client/product-analytics/tsconfig.client.json" },
+     { "path": "./apps/desktop/tsconfig.client.json" },
+diff --git a/tsconfig.host.json b/tsconfig.host.json
+index af38cdb341..55fb8c9469 100644
+--- a/tsconfig.host.json
++++ b/tsconfig.host.json
+@@ -90,6 +90,7 @@
+     "apps/web/tests/desktop-locale.e2e.ts",
+     "apps/web/tests/window-controls.e2e.ts",
+     "apps/web/tests/settings-import.e2e.ts",
++    "apps/web/tests/starbridge.release.ts",
+     "apps/web/tests/models-settings.e2e.ts",
+     "apps/web/tests/deepseek-messages-settings.e2e.ts",
+     "apps/web/tests/deepseek-messages-chat.e2e.ts",
+@@ -221,6 +222,7 @@
+     "scripts/client-bundle-purity.spec.ts"
+   ],
+   "references": [
++    { "path": "./packages/llm/starbridge" },
+     { "path": "./packages/experimental/client-ui-cot-translation/tsconfig.host.json" },
+     { "path": "./packages/experimental/cot-translation-bundle" },
+     { "path": "./packages/experimental/session-search" },

@@ -1,0 +1,82 @@
+{
+  "name": "@kongpingan/dsh-starbridge",
+  "version": "0.1.0-beta.3",
+  "description": "Starbridge / 星桥 — official ChatGPT browser sign-in and Fast mode for DeepSeek Harness",
+  "type": "module",
+  "license": "MIT",
+  "main": "./lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./client": "./lib/client.js",
+    "./typert": "./lib/typert.host.js",
+    "./package.json": "./package.json",
+    "./locale/*.json": "./locale/*.json"
+  },
+  "files": [
+    "lib",
+    "cordis.patch.yml",
+    "icon.svg",
+    "locale",
+    "README.md",
+    "README.zh.md",
+    "LICENSE",
+    "NOTICE",
+    "settings.png"
+  ],
+  "icon": "./icon.svg",
+  "engines": {
+    "node": "^22.19.0 || >=24.0.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org",
+    "tag": "latest"
+  },
+  "keywords": [
+    "deepseek-harness",
+    "chatgpt",
+    "oauth",
+    "dsh",
+    "starbridge"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "inject": [
+        "@deepseek-ai/dsh-client-ui-settings-models",
+        "@deepseek-ai/dsh-client-locale",
+        "@deepseek-ai/dsh-api-remotes"
+      ],
+      "platform": "web"
+    }
+  },
+  "peerDependencies": {
+    "@deepseek-ai/dsh": "0.2.0-rc.2 || 0.2.1-alpha.2",
+    "@deepseek-ai/cordis": "4.0.4 || 4.0.5-alpha.1",
+    "@deepseek-ai/schemastery": "3.18.4 || 3.18.5-alpha.1",
+    "@deepseek-ai/dsh-launch-environment": "0.2.0-rc.2 || 0.2.1-alpha.2",
+    "@deepseek-ai/dsh-llm": "0.2.0-rc.2 || 0.2.1-alpha.2",
+    "@deepseek-ai/dsh-util-values": "0.2.0-rc.2 || 0.2.1-alpha.2",
+    "@deepseek-ai/dsh-timeout": "0.2.0-rc.2 || 0.2.1-alpha.2",
+    "@deepseek-ai/dsh-brand": "0.2.0-rc.2 || 0.2.1-alpha.2",
+    "@deepseek-ai/dsh-attachment": "0.2.0-rc.2 || 0.2.1-alpha.2",
+    "@deepseek-ai/dsh-credentials": "0.2.0-rc.2 || 0.2.1-alpha.2",
+    "@deepseek-ai/dsh-typert-protocol": "0.2.0-rc.2 || 0.2.1-alpha.2",
+    "@deepseek-ai/dsh-authorization": "0.2.0-rc.2 || 0.2.1-alpha.2"
+  },
+  "dependencies": {
+    "@earendil-works/pi-ai": "1.0.2",
+    "jose": "6.2.3",
+    "zod": "4.4.3"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kongxiaoan/dsh-starbridge.git"
+  },
+  "homepage": "https://github.com/kongxiaoan/dsh-starbridge#readme",
+  "bugs": {
+    "url": "https://github.com/kongxiaoan/dsh-starbridge/issues"
+  }
+}

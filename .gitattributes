@@ -1,0 +1,2 @@
+# Preserve mandatory blank context-line prefixes in the integration patch.
+integration/dsh.patch -whitespace

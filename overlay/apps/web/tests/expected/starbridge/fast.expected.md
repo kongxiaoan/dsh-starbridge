@@ -1,0 +1,12 @@
+- region "星桥 · ChatGPT":
+  - text: 星桥 · ChatGPT
+  - paragraph: 在 DeepSeek Harness 中使用你的 ChatGPT 套餐。登录后在对话中选择 Starbridge · ChatGPT 模型
+  - button "使用 ChatGPT 继续"
+  - text: 处理速度
+  - combobox "处理速度":
+    - option "标准"
+    - option "Fast（快速）" [selected]
+  - paragraph: Fast 请求更快的服务档位，保持推理强度不变。可用性取决于账号和模型，可能消耗更多套餐用量；选择后从后续请求生效
+  - paragraph:
+    - link "管理 ChatGPT 用量与应用授权":
+      - /url: https://chatgpt.com/settings/usage

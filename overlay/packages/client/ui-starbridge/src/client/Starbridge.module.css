@@ -1,0 +1,12 @@
+.editor { padding: 16px; border: 1px solid var(--dsw-alias-border-l3); border-radius: 12px; }
+.editorHeader { display: flex; align-items: center; gap: 8px; }
+.editorTitle { font-weight: 500; }
+.intro, .advancedHint { font-size: 13px; line-height: 1.6; color: var(--dsw-alias-label-secondary); }
+.field { display: flex; flex-direction: column; gap: 8px; margin-block: 16px; }
+.fieldLabel { font-size: 13px; }
+.input { width: 100%; padding: 8px; color: var(--dsw-alias-label-primary); background: var(--dsw-alias-settings-card-fill); border: 1px solid var(--dsw-alias-border-l3); border-radius: 6px; }
+.selectInput { appearance: auto; }
+.chatGptActions { display: flex; flex-wrap: wrap; gap: 8px; margin-block: 12px; }
+.primaryButton, .secondaryButton { padding: 8px 12px; color: var(--dsw-alias-label-primary); background: var(--dsw-alias-settings-card-fill); border: 1px solid var(--dsw-alias-border-l3); border-radius: 6px; cursor: pointer; }
+.primaryButton:disabled, .secondaryButton:disabled { opacity: .5; cursor: default; }
+.error { color: var(--dsw-alias-state-error-primary); font-size: 13px; }

@@ -1,0 +1,43 @@
+# Bilingual-pair consistency record for README.md (docs/i18n/README.md): per heading
+# section, a hash of its English and Chinese blocks outside code blocks and generated regions.
+# After editing either side, bring the other along and re-record with:
+#   pnpm run verify-translation-pairing --write packages/llm/starbridge/README.md
+/:
+  en: c15408960fe0f7f0
+  zh: c15408960fe0f7f0
+/deepseek-ai-dsh-starbridge:
+  en: 5209c55802fbf121
+  zh: f5fed5ee600861c8
+/deepseek-ai-dsh-starbridge/summary:
+  en: 8e0f34426df83b28
+  zh: b1cb8723f9b1e6ee
+/deepseek-ai-dsh-starbridge/table-of-contents:
+  en: fe1ecb09a73d1c7a
+  zh: f27eb5ff139d70b4
+/deepseek-ai-dsh-starbridge/use-this-package:
+  en: 3f16d511695e9657
+  zh: bbac2f894c7b50ad
+/deepseek-ai-dsh-starbridge/understand-the-implementation:
+  en: 01c0e29a0ed88efb
+  zh: e9a7d143ad5e9971
+/deepseek-ai-dsh-starbridge/model-experience:
+  en: 215e7ba838619b7b
+  zh: 215e7ba838619b7b
+/deepseek-ai-dsh-starbridge/model-experience/model-requests:
+  en: 6725b54f8c6b45f7
+  zh: 6725b54f8c6b45f7
+/deepseek-ai-dsh-starbridge/model-experience/model-requests/what-the-model-sees:
+  en: 08e1f734fcd3d81d
+  zh: 8b5d265d2a681453
+/deepseek-ai-dsh-starbridge/model-experience/model-requests/token-effect:
+  en: 89d285980d9ff2aa
+  zh: 4a1563da8a60caaa
+/deepseek-ai-dsh-starbridge/model-experience/model-requests/kv-cache-effect:
+  en: 0e3e4a9ea3ad0511
+  zh: b9897c62bc8e9381
+/deepseek-ai-dsh-starbridge/known-limitations-and-deferred-work:
+  en: ec11e5a2b133024f
+  zh: cf84212414aa7b3c
+/deepseek-ai-dsh-starbridge/known-limitations-and-deferred-work/dev-note:
+  en: 85e676abff0e10fa
+  zh: f63d144251353347

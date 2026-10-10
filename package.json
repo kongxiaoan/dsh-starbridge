@@ -1,0 +1,22 @@
+{
+  "name": "dsh-starbridge-source",
+  "private": true,
+  "version": "0.1.0-beta.3",
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "prepare:dsh": "node scripts/workspace.mjs prepare",
+    "sync:dsh": "node scripts/workspace.mjs sync",
+    "build": "node scripts/workspace.mjs build",
+    "test": "node scripts/workspace.mjs test",
+    "check:docs": "node scripts/workspace.mjs docs",
+    "test:browser": "node scripts/workspace.mjs browser"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kongxiaoan/dsh-starbridge.git"
+  },
+  "license": "MIT"
+}

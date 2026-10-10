@@ -1,0 +1,31 @@
+# Bilingual-pair consistency record for README.md (docs/i18n/README.md): per heading
+# section, a hash of its English and Chinese blocks outside code blocks and generated regions.
+# After editing either side, bring the other along and re-record with:
+#   pnpm run verify-translation-pairing --write plugins/starbridge/README.md
+/starbridge-chatgpt:
+  en: 0188b9963de612f3
+  zh: 4f832a9612069c10
+/starbridge-chatgpt/supported-versions:
+  en: 060e3889afcc184a
+  zh: ae17160441b893a2
+/starbridge-chatgpt/install:
+  en: 96069bbc7362f0f8
+  zh: 3ace4604ea3f0e5e
+/starbridge-chatgpt/sign-in-and-use-a-model:
+  en: 9c42d064de1b397f
+  zh: 7a7a7ad0cecc2232
+/starbridge-chatgpt/security-and-account-removal:
+  en: 97a981dc538e7bf3
+  zh: 96e13feed6c00aed
+/starbridge-chatgpt/disable-or-uninstall:
+  en: 236ed222a80e2bb3
+  zh: 7518fe17bea2845d
+/starbridge-chatgpt/troubleshooting:
+  en: 5dc1f8bb0eb651d3
+  zh: 7e2f363731b65437
+/starbridge-chatgpt/development-and-verification:
+  en: a146f259892eccff
+  zh: f43110312f46e306
+/starbridge-chatgpt/license-and-affiliation:
+  en: bb31908cc05eacf2
+  zh: 63020a3163f087e7
