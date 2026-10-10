@@ -2,6 +2,8 @@
 
 [English](README.md) | 中文
 
+[GitHub 源码](https://github.com/kongxiaoan/dsh-starbridge) · [DSH 接入指南](https://github.com/kongxiaoan/dsh-starbridge/blob/main/docs/dsh-integration.md) · [二次开发指南](https://github.com/kongxiaoan/dsh-starbridge/blob/main/docs/development.md) · [问题反馈](https://github.com/kongxiaoan/dsh-starbridge/issues)
+
 ![星桥](icon.svg)
 
 **在 DeepSeek Harness 中使用你的 ChatGPT 套餐。** 星桥是社区插件，支持官方浏览器登录、账号切换、凭据自动续期和可选的 Fast 处理。插件不会索取 ChatGPT 密码，也不会读取 Codex 凭据。
@@ -10,7 +12,7 @@
 
 | 组件 | 本次发布 |
 | --- | --- |
-| 星桥 | `0.1.0-beta.3` |
+| 星桥 | `0.1.0-beta.5` |
 | DeepSeek Harness 桌面端 / Web | **`0.2.0-rc.2`（桌面端最新渠道）和 `0.2.1-alpha.2`（alpha 渠道）** |
 | 已验证平台 | macOS Apple Silicon |
 | Windows / Linux | 本次测试版尚未验证 |
@@ -25,13 +27,13 @@
 在 DeepSeek Harness 桌面端打开 **插件 → 安装**，输入完整包名和版本：
 
 ```text
-@kongpingan/dsh-starbridge@0.1.0-beta.3
+@kongpingan/dsh-starbridge@0.1.0-beta.5
 ```
 
 启用已安装的星桥插件包。若插件管理器提示需要重启，请等待进行中的任务结束后重启桌面端。独立 Harness Web 配置可使用其 CLI：
 
 ```sh
-dsh plugin --profile web add --ignore-scripts @kongpingan/dsh-starbridge@0.1.0-beta.3
+dsh plugin --profile web add --ignore-scripts @kongpingan/dsh-starbridge@0.1.0-beta.5
 ```
 
 CLI 安装后，请打开插件面板启用星桥。`--ignore-scripts` 避免依赖构建提示；星桥无需安装脚本。安装包只增加一个可选插件包，提供独立设置卡片和 `starbridge-chatgpt` 模型路由，不替换已有模型提供方。
@@ -80,7 +82,7 @@ Host 代码归属 `packages/llm/starbridge`，界面代码归属 `packages/clien
 ```sh
 node plugins/starbridge/build.mjs
 npm pack ./.artifacts/starbridge/package --pack-destination .artifacts/starbridge
-npm install --prefix .artifacts/starbridge/clean-install --ignore-scripts ./.artifacts/starbridge/kongpingan-dsh-starbridge-0.1.0-beta.3.tgz
+npm install --prefix .artifacts/starbridge/clean-install --ignore-scripts ./.artifacts/starbridge/kongpingan-dsh-starbridge-0.1.0-beta.5.tgz
 DSH_TEST_BROWSER_CHANNEL=chrome pnpm exec vitest run --config plugins/starbridge/vitest.config.ts
 ```
 

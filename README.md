@@ -10,7 +10,7 @@
 
 | 项目 | 已验证版本 |
 | --- | --- |
-| npm 插件 | `@kongpingan/dsh-starbridge@0.1.0-beta.3` |
+| npm 插件 | `@kongpingan/dsh-starbridge@0.1.0-beta.5` |
 | DSH 桌面端 / Web | `0.2.0-rc.2`、`0.2.1-alpha.2` |
 | 已验证系统 | macOS Apple Silicon |
 | Windows / Linux | 尚未完成平台验证 |
@@ -20,7 +20,7 @@
 
 ## 在桌面端安装
 
-1. 打开 **插件 → 安装**，填写 `@kongpingan/dsh-starbridge@0.1.0-beta.3`。
+1. 打开 **插件 → 安装**，填写 `@kongpingan/dsh-starbridge@0.1.0-beta.5`。
 2. 启用插件。如果应用要求重启，先结束正在进行的任务。
 3. 打开 **设置 → 模型 → 星桥 · ChatGPT**，点击 **使用 ChatGPT 继续**。
 4. 在浏览器中完成官方授权，回到 DSH，在模型选择器中选取 **Starbridge · ChatGPT** 下有权使用的模型。
@@ -34,7 +34,7 @@
 如果只想使用插件，无需修改 DSH 的代码。在对应版本的 DSH 项目根目录运行：
 
 ```sh
-pnpm dsh plugin --profile web add --ignore-scripts @kongpingan/dsh-starbridge@0.1.0-beta.3
+pnpm dsh plugin --profile web add --ignore-scripts @kongpingan/dsh-starbridge@0.1.0-beta.5
 pnpm dsh --profile web
 ```
 

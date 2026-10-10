@@ -2,6 +2,8 @@
 
 English | [中文](README.zh.md)
 
+[Source code](https://github.com/kongxiaoan/dsh-starbridge) · [DSH integration](https://github.com/kongxiaoan/dsh-starbridge/blob/main/docs/dsh-integration.md) · [Development guide](https://github.com/kongxiaoan/dsh-starbridge/blob/main/docs/development.md) · [Report an issue](https://github.com/kongxiaoan/dsh-starbridge/issues)
+
 ![Starbridge](icon.svg)
 
 **Your ChatGPT plan, inside DeepSeek Harness.** Starbridge is a community plugin for official browser sign-in, account switching, credential renewal, and optional Fast processing. It does not request your ChatGPT password or read Codex credentials.
@@ -10,7 +12,7 @@ English | [中文](README.zh.md)
 
 | Component | This release |
 | --- | --- |
-| Starbridge | `0.1.0-beta.3` |
+| Starbridge | `0.1.0-beta.5` |
 | DeepSeek Harness Desktop / Web | **`0.2.0-rc.2` (desktop latest) and `0.2.1-alpha.2` (alpha)** |
 | Verified platform | macOS Apple Silicon |
 | Windows / Linux | Not validated for this beta |
@@ -25,13 +27,13 @@ This is a preview release. Matching a version does not grant ChatGPT model or Fa
 In DeepSeek Harness Desktop, open **Plugins → Install** and enter the exact package specification:
 
 ```text
-@kongpingan/dsh-starbridge@0.1.0-beta.3
+@kongpingan/dsh-starbridge@0.1.0-beta.5
 ```
 
 Select the installed Starbridge bundle. Restart the desktop app when the plugin manager requests it, after ongoing tasks have finished. For a standalone Harness Web profile, use its CLI:
 
 ```sh
-dsh plugin --profile web add --ignore-scripts @kongpingan/dsh-starbridge@0.1.0-beta.3
+dsh plugin --profile web add --ignore-scripts @kongpingan/dsh-starbridge@0.1.0-beta.5
 ```
 
 After CLI installation, open Plugins and enable Starbridge. `--ignore-scripts` avoids dependency build prompts; Starbridge does not need installation scripts. The package installs one optional bundle. It adds its own settings card and `starbridge-chatgpt` model route; it does not replace existing model providers.
@@ -80,7 +82,7 @@ The Host owner is `packages/llm/starbridge`; the browser owner is `packages/clie
 ```sh
 node plugins/starbridge/build.mjs
 npm pack ./.artifacts/starbridge/package --pack-destination .artifacts/starbridge
-npm install --prefix .artifacts/starbridge/clean-install --ignore-scripts ./.artifacts/starbridge/kongpingan-dsh-starbridge-0.1.0-beta.3.tgz
+npm install --prefix .artifacts/starbridge/clean-install --ignore-scripts ./.artifacts/starbridge/kongpingan-dsh-starbridge-0.1.0-beta.5.tgz
 DSH_TEST_BROWSER_CHANNEL=chrome pnpm exec vitest run --config plugins/starbridge/vitest.config.ts
 ```
 

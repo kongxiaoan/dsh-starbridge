@@ -1,6 +1,6 @@
 {
   "name": "@kongpingan/dsh-starbridge",
-  "version": "0.1.0-beta.3",
+  "version": "0.1.0-beta.5",
   "description": "Starbridge / 星桥 — official ChatGPT browser sign-in and Fast mode for DeepSeek Harness",
   "type": "module",
   "license": "MIT",

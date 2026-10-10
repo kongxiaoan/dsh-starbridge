@@ -3,11 +3,11 @@
 # After editing either side, bring the other along and re-record with:
 #   pnpm run verify-translation-pairing --write plugins/starbridge/README.md
 /starbridge-chatgpt:
-  en: 0188b9963de612f3
-  zh: 4f832a9612069c10
+  en: f4407c48dc6d8ac5
+  zh: d73dac71684bc675
 /starbridge-chatgpt/supported-versions:
-  en: 060e3889afcc184a
-  zh: ae17160441b893a2
+  en: 59aa611cafd3a7fe
+  zh: 95967cdaf1c47d28
 /starbridge-chatgpt/install:
   en: 96069bbc7362f0f8
   zh: 3ace4604ea3f0e5e
