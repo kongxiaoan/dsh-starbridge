@@ -3,6 +3,7 @@
   "commit": "d743267388641bc76f17c45ce8b4c231aed1d32c",
   "supportedRuntimeVersions": [
     "0.2.0-rc.2",
-    "0.2.1-alpha.2"
+    "0.2.1-alpha.2",
+    "0.2.1-rc.2"
   ]
 }

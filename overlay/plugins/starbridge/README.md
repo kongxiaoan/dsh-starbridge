@@ -12,8 +12,8 @@ English | [中文](README.zh.md)
 
 | Component | This release |
 | --- | --- |
-| Starbridge | `0.1.0-beta.5` |
-| DeepSeek Harness Desktop / Web | **`0.2.0-rc.2` (desktop latest) and `0.2.1-alpha.2` (alpha)** |
+| Starbridge | `0.1.0-beta.6` |
+| DeepSeek Harness Desktop / Web | **`0.2.0-rc.2`, `0.2.1-alpha.2`, and `0.2.1-rc.2`** |
 | Verified platform | macOS Apple Silicon |
 | Windows / Linux | Not validated for this beta |
 | Earlier or later Harness versions | Not declared compatible; installation checks the listed framework peer versions |
@@ -27,13 +27,13 @@ This is a preview release. Matching a version does not grant ChatGPT model or Fa
 In DeepSeek Harness Desktop, open **Plugins → Install** and enter the exact package specification:
 
 ```text
-@kongpingan/dsh-starbridge@0.1.0-beta.5
+@kongpingan/dsh-starbridge@0.1.0-beta.6
 ```
 
 Select the installed Starbridge bundle. Restart the desktop app when the plugin manager requests it, after ongoing tasks have finished. For a standalone Harness Web profile, use its CLI:
 
 ```sh
-dsh plugin --profile web add --ignore-scripts @kongpingan/dsh-starbridge@0.1.0-beta.5
+dsh plugin --profile web add --ignore-scripts @kongpingan/dsh-starbridge@0.1.0-beta.6
 ```
 
 After CLI installation, open Plugins and enable Starbridge. `--ignore-scripts` avoids dependency build prompts; Starbridge does not need installation scripts. The package installs one optional bundle. It adds its own settings card and `starbridge-chatgpt` model route; it does not replace existing model providers.
@@ -82,13 +82,13 @@ The Host owner is `packages/llm/starbridge`; the browser owner is `packages/clie
 ```sh
 node plugins/starbridge/build.mjs
 npm pack ./.artifacts/starbridge/package --pack-destination .artifacts/starbridge
-npm install --prefix .artifacts/starbridge/clean-install --ignore-scripts ./.artifacts/starbridge/kongpingan-dsh-starbridge-0.1.0-beta.5.tgz
+npm install --prefix .artifacts/starbridge/clean-install --ignore-scripts ./.artifacts/starbridge/kongpingan-dsh-starbridge-0.1.0-beta.6.tgz
 DSH_TEST_BROWSER_CHANNEL=chrome pnpm exec vitest run --config plugins/starbridge/vitest.config.ts
 ```
 
 Tests cover OAuth callback validation, token renewal, cancellation, revocation failure, streamed Requests, service-tier serialization, and browser controls. Compatibility evidence and publication checks are recorded with the release artifacts. Live account access still depends on the user's consent and entitlement.
 
-The release peer ranges are explicit in `plugins/starbridge/package.json`; the build rejects undeclared framework imports. `verify-runtime.mjs` checks both supported versions and rejects untested versions, then probes settings writes and OAuth start/cancel against an isolated running Web profile. Pass the runtime installation directory and its startup log; use a test home without real accounts.
+The release peer ranges are explicit in `plugins/starbridge/package.json`; the build rejects undeclared framework imports. `verify-runtime.mjs` checks all supported versions and rejects untested versions, then probes settings writes and OAuth start/cancel against an isolated running Web profile. Pass the runtime installation directory and its startup log; use a test home without real accounts.
 
 ```sh
 node plugins/starbridge/verify-runtime.mjs <runtime-installation> <web-startup-log>

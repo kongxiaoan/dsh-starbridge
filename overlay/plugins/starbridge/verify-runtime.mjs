@@ -9,10 +9,10 @@ if (!installation || !logFile) throw new Error('Usage: node verify-runtime.mjs <
 const requireRuntime = createRequire(resolve(installation, 'package.json'))
 const { evaluatePluginCompatibility } = requireRuntime('@deepseek-ai/dsh-app-boot')
 const manifest = JSON.parse(await readFile(new URL('../../.artifacts/starbridge/package/package.json', import.meta.url), 'utf8'))
-for (const version of ['0.2.0-rc.2', '0.2.1-alpha.2']) {
+for (const version of ['0.2.0-rc.2', '0.2.1-alpha.2', '0.2.1-rc.2']) {
   assert.equal(evaluatePluginCompatibility(manifest, {}, version), undefined)
 }
-for (const version of ['0.2.0-rc.1', '0.2.1-alpha.3', '0.3.0']) {
+for (const version of ['0.2.0-rc.1', '0.2.1-alpha.3', '0.2.1-rc.1', '0.2.1-rc.3', '0.3.0']) {
   assert.ok(evaluatePluginCompatibility(manifest, {}, version))
 }
 const log = await readFile(logFile, 'utf8')

@@ -2,7 +2,7 @@
 
 ## 构建模型
 
-本仓库保存可编辑源码及必要的 DSH 集成补丁。构建使用 [固定 DSH 提交](../integration/dsh.json)的工作区、编译器、Remote 生成器、CSS 和 Client 工具链。固定构建基线与运行时兼容范围是两个概念：用 alpha 基线编译的发行物已在 `0.2.0-rc.2` 与 `0.2.1-alpha.2` 运行时分别验证。
+本仓库保存可编辑源码及必要的 DSH 集成补丁。构建使用 [固定 DSH 提交](../integration/dsh.json)的工作区、编译器、Remote 生成器、CSS 和 Client 工具链。固定构建基线与运行时兼容范围是两个概念：用 alpha 基线编译的发行物支持 `0.2.0-rc.2`、`0.2.1-alpha.2` 和 `0.2.1-rc.2`，兼容范围由发行运行时验证。
 
 首次准备需要网络访问 GitHub 与 npm。建议使用 Node.js 24，安装 Git、npm 和 DSH 基线要求的 pnpm `11.28.5`；构建 native 组件还需要 DSH 官方开发文档要求的平台工具链。macOS 使用 Xcode Command Line Tools。
 
@@ -68,6 +68,8 @@ node plugins/starbridge/verify-runtime.mjs <运行时安装目录> <Web启动日
 
 此探测会修改测试配置的速度档位、发起再取消 OAuth，并恢复原档位。因此只对不含真实账号的隔离测试主目录运行。它会检查已支持版本的接受、未测试版本的拒绝、配置写入、官方授权地址及取消后的监听器释放。日志含本地访问令牌，不能提交到 GitHub。
 
+在源码仓库根目录运行 `node scripts/verify-browser.mjs <Web启动日志>`，可对同一个 `0.2.1-rc.2` 发行运行时执行 Chrome 验证：账号状态订阅、授权发起/取消、回调释放，以及 Fast/标准设置刷新后保持。脚本复用 `.work/dsh` 的 Playwright，使用新的浏览器上下文；只对测试主目录运行，成功后处理速度为标准。
+
 ## 打包与发布
 
 发行清单位于 `overlay/plugins/starbridge/package.json`，不是仓库根目录的私有工具清单。修改代码后，先递增版本，同时更新两个语言的发行 README，再重新构建和验证。
@@ -85,6 +87,8 @@ Fork 后应使用自己的 npm 名称，并同步修改 bundle 中的包名及�
 ## 现有验证与限制
 
 发布 `0.1.0-beta.3` 前已完成 19 项定向单元/组合/UI 测试、2 项 Chrome 发行测试，以及两个声明版本的运行时探测；rc.2 安装与卸载未使用版本豁免。文档检查为 43 项通过。
+
+`0.1.0-beta.6` 增加 `0.2.1-rc.2` 及其 Cordis/Schemastery 发行版本的精确 peer 范围，保持构建基线和业务代码不变。该版本完成构建、19 项定向测试、2 项构建基线 Chrome 测试，以及 rc.2 发行运行时的正常安装、Remote 探测、Chrome 设置持久化和卸载检查。
 
 此前 DSH 全量 hygiene 有一个已知的上游 `vendor-rescope` 检查失败（17 处已有残留）；其他 18 项通过。这里不将全量 hygiene 声称为通过。真实 ChatGPT 授权与付费模型推理、Windows 和 Linux 均不在已验证范围内。
 

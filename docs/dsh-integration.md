@@ -13,10 +13,10 @@
 
 ## npm 插件
 
-支持 DSH `0.2.0-rc.2` 和 `0.2.1-alpha.2`。在已有 DSH 源码项目根目录运行：
+支持 DSH `0.2.0-rc.2`、`0.2.1-alpha.2` 和 `0.2.1-rc.2`。在已有 DSH 源码项目根目录运行：
 
 ```sh
-pnpm dsh plugin --profile web add --ignore-scripts @kongpingan/dsh-starbridge@0.1.0-beta.5
+pnpm dsh plugin --profile web add --ignore-scripts @kongpingan/dsh-starbridge@0.1.0-beta.6
 pnpm dsh --profile web
 ```
 
@@ -29,7 +29,7 @@ pnpm dsh --profile web
 在本仓库构建后，将实际生成的压缩包绝对路径交给 DSH 插件管理器：
 
 ```sh
-pnpm dsh plugin --profile web add --ignore-scripts /absolute/path/to/dsh-starbridge/dist/kongpingan-dsh-starbridge-0.1.0-beta.5.tgz
+pnpm dsh plugin --profile web add --ignore-scripts /absolute/path/to/dsh-starbridge/dist/kongpingan-dsh-starbridge-0.1.0-beta.6.tgz
 pnpm dsh --profile web
 ```
 
